@@ -2,6 +2,7 @@
 <html lang="ko" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>도쿄 디즈니랜드 여행 가이드</title>
   <style>
     /* ── 라이트 테마 변수 ── */
@@ -376,6 +377,18 @@
     @media (max-width: 600px) {
       ul.tip-list, ol.ride-list { grid-template-columns: 1fr; }
       .hero h1 { font-size: 1.8rem; }
+      .hero { padding: 50px 16px 40px; }
+      .theme-toggle { top: 12px; right: 12px; padding: 6px 12px; font-size: 0.78rem; }
+      .toc-bar { gap: 2px; padding: 0 8px; }
+      .toc-bar a { padding: 10px 10px; font-size: 0.78rem; }
+      .container { padding: 30px 16px; }
+      .section-header h2 { font-size: 1.3rem; }
+      table { font-size: 0.82rem; }
+      th, td { padding: 10px 12px; }
+      .ending { padding: 28px 20px; }
+      .ending h2 { font-size: 1.4rem; }
+      /* 표가 화면보다 넓을 때 가로 스크롤 */
+      table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
