@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>도쿄 디즈니랜드 여행 가이드</title>
+  <style>
+    /* ── 라이트 테마 변수 ── */
+    :root {
+      --body-bg: #fff9f5;
+      --hero-bg: linear-gradient(160deg, #f093fb 0%, #f5576c 40%, #fd7014 100%);
+      --toc-bg: #ffffff;
+      --toc-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --toc-link: #666;
+      --toc-hover: #f5576c;
+      --card-bg: #ffffff;
+      --card-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      --card-top: #f5576c;
+      --text-main: #1a1a2e;
+      --text-sub: #555;
+      --text-muted: #999;
+      --accent: #f5576c;
+      --sub-title-color: #f5576c;
+      --table-th: linear-gradient(135deg, #f5576c, #f093fb);
+      --table-td-bg: #ffffff;
+      --table-td-alt: #fefefe;
+      --table-td-border: #f5f5f5;
+      --table-hover: #fff5f7;
+      --ending-bg: linear-gradient(135deg, #f093fb, #f5576c);
+      --footer-text: #bbb;
+      --toggle-bg: rgba(245,87,108,0.12);
+      --toggle-border: rgba(245,87,108,0.3);
+      --toggle-text: #f5576c;
+      --toggle-shadow: 0 2px 10px rgba(245,87,108,0.2);
+      --ride-num-bg: linear-gradient(135deg, #f5576c, #f093fb);
+      --wait-bg: #fff8f9;
+    }
+
+    /* ── 다크 테마 변수 ── */
+    [data-theme="dark"] {
+      --body-bg: #0d0d14;
+      --hero-bg: linear-gradient(160deg, #6a0572 0%, #a01535 40%, #8b3a00 100%);
+      --toc-bg: #1a1a2e;
+      --toc-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      --toc-link: #9090b0;
+      --toc-hover: #ff7b9c;
+      --card-bg: #1a1a2e;
+      --card-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      --card-top: #c0392b;
+      --text-main: #cdd6f4;
+      --text-sub: #a6adc8;
+      --text-muted: #585b70;
+      --accent: #ff7b9c;
+      --sub-title-color: #ff7b9c;
+      --table-th: linear-gradient(135deg, #a01535, #6a0572);
+      --table-td-bg: #1a1a2e;
+      --table-td-alt: #141425;
+      --table-td-border: #2a2a40;
+      --table-hover: #251525;
+      --ending-bg: linear-gradient(135deg, #6a0572, #a01535);
+      --footer-text: #585b70;
+      --toggle-bg: rgba(255,123,156,0.12);
+      --toggle-border: rgba(255,123,156,0.3);
+      --toggle-text: #ff7b9c;
+      --toggle-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      --ride-num-bg: linear-gradient(135deg, #a01535, #6a0572);
+      --wait-bg: #1a0d15;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--body-bg);
+      color: var(--text-sub);
+      line-height: 1.7;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── 토글 스위치 ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--toggle-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--toggle-border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      cursor: pointer;
+      box-shadow: var(--toggle-shadow);
+      color: var(--toggle-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      user-select: none;
+    }
+    .theme-toggle:hover { transform: scale(1.05); }
+
+    .toggle-track {
+      width: 40px; height: 22px;
+      background: rgba(245,87,108,0.3);
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.3s;
+    }
+    [data-theme="dark"] .toggle-track { background: #ff7b9c; }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
+
+    /* ── 히어로 ── */
+    .hero {
+      background: var(--hero-bg);
+      color: white;
+      text-align: center;
+      padding: 70px 20px 60px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .hero::before {
+      content: '🏰';
+      position: absolute;
+      font-size: 200px;
+      opacity: 0.08;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.25);
+      border-radius: 30px;
+      padding: 6px 20px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .hero p { font-size: 1.1rem; opacity: 0.92; }
+
+    /* ── 목차 바 ── */
+    .toc-bar {
+      background: var(--toc-bg);
+      box-shadow: var(--toc-shadow);
+      padding: 0 20px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .toc-bar a {
+      display: inline-block;
+      padding: 14px 16px;
+      color: var(--toc-link);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .toc-bar a:hover {
+      color: var(--toc-hover);
+      border-bottom-color: var(--toc-hover);
+    }
+
+    /* ── 컨테이너 ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    .section { margin-bottom: 50px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .section-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .icon-lang   { background: #fce4ec; }
+    .icon-ticket { background: #e8f5e9; }
+    .icon-ride   { background: #e3f2fd; }
+    .icon-food   { background: #fff8e1; }
+    .icon-shop   { background: #f3e5f5; }
+    .icon-tips   { background: #e0f2f1; }
+
+    [data-theme="dark"] .icon-lang   { background: #3a0a1a; }
+    [data-theme="dark"] .icon-ticket { background: #0a2a10; }
+    [data-theme="dark"] .icon-ride   { background: #0a1a3a; }
+    [data-theme="dark"] .icon-food   { background: #2a1a00; }
+    [data-theme="dark"] .icon-shop   { background: #1a0a2a; }
+    [data-theme="dark"] .icon-tips   { background: #002a28; }
+
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      transition: color 0.3s;
+    }
+
+    .sub-title {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--sub-title-color);
+      margin: 22px 0 12px;
+      padding-left: 14px;
+      border-left: 3px solid var(--sub-title-color);
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    /* ── 표 ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      font-size: 0.92rem;
+    }
+    th {
+      background: var(--table-th);
+      color: white;
+      padding: 13px 18px;
+      text-align: left;
+      font-weight: 700;
+    }
+    td {
+      padding: 12px 18px;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--table-td-border);
+      background: var(--table-td-bg);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--table-td-alt); }
+    tr:hover td { background: var(--table-hover); }
+
+    /* ── 팁 카드 그리드 ── */
+    ul.tip-list {
+      padding-left: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    ul.tip-list li {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: var(--card-shadow);
+      color: var(--text-sub);
+      border-top: 3px solid var(--card-top);
+      font-size: 0.93rem;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    ul.tip-list li b {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    /* ── 놀이기구 TOP5 ── */
+    ol.ride-list {
+      padding-left: 0;
+      list-style: none;
+      counter-reset: ride;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    ol.ride-list li {
+      counter-increment: ride;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px 18px 16px 56px;
+      position: relative;
+      box-shadow: var(--card-shadow);
+      color: var(--text-sub);
+      font-size: 0.93rem;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    ol.ride-list li::before {
+      content: counter(ride);
+      position: absolute; left: 16px; top: 16px;
+      background: var(--ride-num-bg);
+      color: white;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800;
+    }
+    ol.ride-list li b {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 4px;
+      transition: color 0.3s;
+    }
+
+    /* ── 대기 팁 리스트 ── */
+    ul.wait-list { padding-left: 0; list-style: none; }
+    ul.wait-list li {
+      padding: 10px 14px 10px 36px;
+      position: relative;
+      color: var(--text-sub);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      background: var(--wait-bg);
+      font-size: 0.93rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    ul.wait-list li::before { content: '💡'; position: absolute; left: 10px; top: 10px; font-size: 0.9rem; }
+
+    /* ── 마무리 배너 ── */
+    .ending {
+      background: var(--ending-bg);
+      color: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+    .ending h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 14px; }
+    .ending p  { opacity: 0.92; margin-bottom: 8px; font-size: 1rem; }
+    .ending .summary {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border-radius: 30px;
+      padding: 10px 24px;
+      margin-top: 14px;
+      font-weight: 700; font-size: 0.95rem;
+    }
+
+    /* ── 푸터 ── */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--footer-text);
+      font-size: 0.82rem;
+      transition: color 0.3s;
+    }
+
+    @media (max-width: 600px) {
+      ul.tip-list, ol.ride-list { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 다크/라이트 토글 스위치 -->
+  <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드 전환">
+    <span id="toggleEmoji">🌙</span>
+    <div class="toggle-track">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span id="toggleLabel">다크</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag">✨ 첫 방문자를 위한 완벽 가이드</div>
+    <h1>🏰 도쿄 디즈니랜드<br>여행 가이드</h1>
+    <p>처음 가는 도쿄 디즈니랜드, 이것만 알면 걱정 없어요!</p>
+  </div>
+
+  <nav class="toc-bar">
+    <a href="#s1">🗣️ 일본어</a>
+    <a href="#s2">🎟️ 티켓</a>
+    <a href="#s3">🎢 놀이기구</a>
+    <a href="#s4">🍽️ 음식</a>
+    <a href="#s5">🛍️ 쇼핑</a>
+    <a href="#s6">📌 기타 팁</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="section" id="s1">
+      <div class="section-header">
+        <div class="section-icon icon-lang">🗣️</div>
+        <h2>기초 일본어 회화</h2>
+      </div>
+      <p style="color:var(--text-sub); margin-bottom:20px;">디즈니랜드 직원들은 영어도 어느 정도 통하지만, 간단한 일본어를 알면 훨씬 편합니다!</p>
+
+      <div class="sub-title">인사 / 기본</div>
+      <table>
+        <tr><th>한국어</th><th>일본어</th><th>발음</th></tr>
+        <tr><td>안녕하세요</td><td>こんにちは</td><td>곤니치와</td></tr>
+        <tr><td>감사합니다</td><td>ありがとうございます</td><td>아리가토 고자이마스</td></tr>
+        <tr><td>죄송합니다</td><td>すみません</td><td>스미마셍</td></tr>
+        <tr><td>괜찮습니다</td><td>大丈夫です</td><td>다이죠부 데스</td></tr>
+        <tr><td>네 / 아니오</td><td>はい / いいえ</td><td>하이 / 이이에</td></tr>
+      </table>
+
+      <div class="sub-title">길 / 위치 묻기</div>
+      <table>
+        <tr><th>한국어</th><th>일본어</th><th>발음</th></tr>
+        <tr><td>화장실이 어디에 있나요?</td><td>トイレはどこですか?</td><td>토이레와 도코 데스카?</td></tr>
+        <tr><td>입구는 어디인가요?</td><td>入口はどこですか?</td><td>이리구치와 도코 데스카?</td></tr>
+        <tr><td>지도를 주세요</td><td>地図をください</td><td>치즈오 쿠다사이</td></tr>
+        <tr><td>사진 찍어 주실 수 있나요?</td><td>写真を撮っていただけますか?</td><td>샤신오 톳테 이타다케마스카?</td></tr>
+      </table>
+
+      <div class="sub-title">놀이기구 &amp; 대기줄</div>
+      <table>
+        <tr><th>한국어</th><th>일본어</th><th>발음</th></tr>
+        <tr><td>대기 시간이 얼마나 되나요?</td><td>待ち時間はどのくらいですか?</td><td>마치지칸와 도노쿠라이 데스카?</td></tr>
+        <tr><td>한 명입니다</td><td>一人です</td><td>히토리 데스</td></tr>
+        <tr><td>두 명입니다</td><td>二人です</td><td>후타리 데스</td></tr>
+        <tr><td>이것을 주세요</td><td>これをください</td><td>코레오 쿠다사이</td></tr>
+      </table>
+
+      <div class="sub-title">식당 / 쇼핑</div>
+      <table>
+        <tr><th>한국어</th><th>일본어</th><th>발음</th></tr>
+        <tr><td>이거 하나 주세요</td><td>これを一つください</td><td>코레오 히토츠 쿠다사이</td></tr>
+        <tr><td>얼마예요?</td><td>いくらですか?</td><td>이쿠라 데스카?</td></tr>
+        <tr><td>카드 되나요?</td><td>カードは使えますか?</td><td>카드와 츠카에마스카?</td></tr>
+        <tr><td>맛있어요!</td><td>おいしい！</td><td>오이시이!</td></tr>
+        <tr><td>봉투 필요 없습니다</td><td>袋はいりません</td><td>후쿠로와 이리마셍</td></tr>
+      </table>
+    </div>
+
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-icon icon-ticket">🎟️</div>
+        <h2>입장 &amp; 티켓 꿀팁</h2>
+      </div>
+      <ul class="tip-list">
+        <li><b>티켓은 반드시 사전 구매!</b>현장 구매는 매진이거나 줄이 매우 깁니다. 공식 앱에서 미리 구매하세요.</li>
+        <li><b>오픈 30분~1시간 전 도착</b>오픈과 동시에 인기 놀이기구로 달려가야 대기 시간을 줄일 수 있습니다.</li>
+        <li><b>공식 앱 필수 설치</b>현재 대기 시간, 쇼 시간표, 지도를 실시간으로 확인할 수 있습니다.</li>
+        <li><b>DPA(디즈니 프리미어 액세스)</b>유료로 인기 놀이기구 대기를 건너뛸 수 있습니다. 스페이스마운틴 등에 효율적입니다.</li>
+        <li><b>평일 방문 추천</b>주말/공휴일은 매우 혼잡합니다. 평일이 훨씬 쾌적합니다.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-icon icon-ride">🎢</div>
+        <h2>놀이기구 꿀팁</h2>
+      </div>
+      <div class="sub-title">꼭 타야 하는 인기 놀이기구 TOP 5</div>
+      <ol class="ride-list">
+        <li><b>빅써더마운틴</b>광산 열차 테마의 롤러코스터. 무난하게 즐길 수 있음</li>
+        <li><b>스페이스마운틴</b>우주 테마 실내 롤러코스터. 어두운 공간에서 빠르게 달림</li>
+        <li><b>혼티드맨션</b>유령의 집 테마. 무섭지 않고 분위기가 독특함</li>
+        <li><b>잇츠 어 스몰 월드</b>전 세계 인형들이 노래하는 배 타는 어트랙션. 부담 없음</li>
+        <li><b>버즈 라이트이어 아스트로 블래스터</b>슈팅 게임형 놀이기구. 점수 경쟁 재미있음</li>
+      </ol>
+      <div class="sub-title">대기 줄 팁</div>
+      <ul class="wait-list">
+        <li>오픈 직후 가장 인기 있는 놀이기구부터 타세요 — 오후 될수록 대기가 급격히 늘어납니다</li>
+        <li>퍼레이드 &amp; 쇼 시간에는 놀이기구 대기가 줄어듭니다 — 이 시간을 노리세요</li>
+        <li>폐장 1시간 전에도 대기가 줄어드는 편입니다</li>
+        <li>앱에서 대기 시간을 수시로 체크하며 짧은 곳부터 공략하세요</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-icon icon-food">🍽️</div>
+        <h2>음식 꿀팁</h2>
+      </div>
+      <ul class="tip-list">
+        <li><b>디즈니 캐릭터 푸드 필수!</b>미키 모양 와플, 미키 만주 등 디즈니에서만 먹을 수 있는 음식을 꼭 드세요</li>
+        <li><b>점심은 11시~12시 사이에</b>12시~1시는 식당마다 긴 줄이 생깁니다. 조금 이른 점심을 추천합니다</li>
+        <li><b>모바일 오더 사용</b>공식 앱에서 음식을 미리 주문하면 줄 서지 않고 받을 수 있습니다</li>
+        <li><b>간식 &amp; 음료는 파크 내에서</b>외부 음식 반입은 제한적. 단, 생수와 간단한 과자는 가능합니다</li>
+        <li><b>미키 프레첼, 칠면조 다리</b>길거리 스낵으로 인기. 걸으면서 먹기 좋습니다</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-icon icon-shop">🛍️</div>
+        <h2>쇼핑 꿀팁</h2>
+      </div>
+      <ul class="tip-list">
+        <li><b>굿즈는 폐장 1~2시간 전에</b>아침부터 사면 하루 종일 들고 다녀야 해서 불편합니다</li>
+        <li><b>월드 바자르(입구 쪽)</b>종류가 가장 많고 폐장 후에도 잠깐 열려 있어 마지막에 쇼핑하기 좋습니다</li>
+        <li><b>한정판 굿즈는 오전 중에</b>한정 상품은 빨리 팔리니 오전 중에 확인하세요</li>
+        <li><b>짐 맡기기(코인로커)</b>입구 근처에 코인로커가 있습니다. 짐을 맡기고 가볍게 즐기세요</li>
+        <li><b>면세 가능</b>합산 5,000엔 이상 구매 시 면세 적용 가능합니다</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-icon icon-tips">📌</div>
+        <h2>기타 꿀팁</h2>
+      </div>
+      <ul class="tip-list">
+        <li><b>날씨 대비</b>걷는 시간이 많으니 편한 신발 필수. 모자, 선크림, 우비(비 대비)도 챙기세요</li>
+        <li><b>보조배터리 필수</b>앱을 계속 켜야 하므로 배터리 소모가 빠릅니다</li>
+        <li><b>엔화 현금 준비</b>일부 매장은 현금만 가능합니다. 어느 정도 현금을 챙겨가세요</li>
+        <li><b>퍼레이드 자리는 1시간 전부터</b>메인 퍼레이드는 인기가 많아 자리 선점이 필요합니다</li>
+        <li><b>캐릭터 사인 &amp; 사진</b>캐릭터 그리팅 장소와 시간을 앱에서 미리 확인하세요</li>
+        <li><b>비 오는 날도 나쁘지 않음</b>방문객이 적어 놀이기구 대기가 짧아집니다. 우비 챙기면 꿀날!</li>
+      </ul>
+    </div>
+
+    <div class="ending">
+      <h2>즐거운 여행 되세요! 🎉</h2>
+      <p>첫 도쿄 디즈니랜드 방문, 설레는 마음으로 마음껏 즐기고 오세요!</p>
+      <div class="summary">앱 설치 + 사전 티켓 구매 + 오픈 일찍 입장 = 성공적인 디즈니랜드!</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <small>도쿄 디즈니랜드 여행 가이드 | 2026년 기준</small>
+  </div>
+
+  <script>
+    const saved = localStorage.getItem('theme') || 'light';
+    applyTheme(saved);
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const isDark = theme === 'dark';
+      document.getElementById('toggleEmoji').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = isDark ? '라이트' : '다크';
+    }
+  </script>
+
+</body>
+</html>

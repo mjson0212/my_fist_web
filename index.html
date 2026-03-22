@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <title>홍길동의 홈페이지</title>
+  <style>
+    /* ── 라이트 테마 변수 ── */
+    :root {
+      --body-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card-bg: #ffffff;
+      --card-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --text-main: #333;
+      --text-sub: #555;
+      --section-h2: #764ba2;
+      --divider: #eee;
+      --interest-bg: #f0eeff;
+      --goal-bg: #fff8f0;
+      --quote-bg: linear-gradient(135deg, #f0eeff, #fff0f8);
+      --contact-bg: #f8f8f8;
+      --contact-hover: #f0eeff;
+      --footer-bg: #fafafa;
+      --footer-border: #eee;
+      --footer-text: #aaa;
+      --toggle-bg: rgba(255,255,255,0.2);
+      --toggle-text: white;
+      --toggle-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    /* ── 다크 테마 변수 ── */
+    [data-theme="dark"] {
+      --body-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      --card-bg: #1e1e2e;
+      --card-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      --header-bg: linear-gradient(135deg, #4a4a8a 0%, #5a3a7a 100%);
+      --text-main: #cdd6f4;
+      --text-sub: #a6adc8;
+      --section-h2: #cba6f7;
+      --divider: #313244;
+      --interest-bg: #2a2a3e;
+      --goal-bg: #2e2a1e;
+      --quote-bg: linear-gradient(135deg, #2a2a3e, #2e1e2e);
+      --contact-bg: #252535;
+      --contact-hover: #2a2a3e;
+      --footer-bg: #181825;
+      --footer-border: #313244;
+      --footer-text: #585b70;
+      --toggle-bg: rgba(255,255,255,0.1);
+      --toggle-text: #cdd6f4;
+      --toggle-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--body-bg);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: var(--text-main);
+      transition: background 0.3s;
+    }
+
+    /* ── 다크/라이트 토글 스위치 ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--toggle-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px;
+      padding: 8px 16px;
+      cursor: pointer;
+      box-shadow: var(--toggle-shadow);
+      color: var(--toggle-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      user-select: none;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.05);
+    }
+
+    .toggle-track {
+      width: 40px;
+      height: 22px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    [data-theme="dark"] .toggle-track {
+      background: #cba6f7;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    [data-theme="dark"] .toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    /* ── 카드 ── */
+    .card {
+      max-width: 700px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .header {
+      background: var(--header-bg);
+      color: white;
+      text-align: center;
+      padding: 50px 30px 40px;
+      transition: background 0.3s;
+    }
+
+    .avatar {
+      width: 90px; height: 90px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 20px;
+      border: 3px solid rgba(255,255,255,0.6);
+    }
+
+    .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .header p  { font-size: 1rem; opacity: 0.85; }
+
+    .content { padding: 40px 50px; }
+
+    .section { margin-bottom: 36px; }
+
+    .section h2 {
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--section-h2);
+      border-left: 4px solid #667eea;
+      padding-left: 12px;
+      margin-bottom: 16px;
+      transition: color 0.3s;
+    }
+
+    .section p {
+      color: var(--text-sub);
+      line-height: 1.8;
+      margin-bottom: 8px;
+      transition: color 0.3s;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--divider);
+      margin: 30px 0;
+      transition: border-color 0.3s;
+    }
+
+    ul.interest-list, ol.goal-list { padding-left: 0; list-style: none; }
+
+    ul.interest-list li {
+      background: var(--interest-bg);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      color: var(--text-sub);
+      display: flex; align-items: center; gap: 10px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    ul.interest-list li::before { content: '✦'; color: #764ba2; font-size: 0.8rem; }
+
+    ol.goal-list { counter-reset: goal-counter; }
+    ol.goal-list li {
+      counter-increment: goal-counter;
+      background: var(--goal-bg);
+      border-radius: 10px;
+      padding: 10px 16px 10px 50px;
+      margin-bottom: 8px;
+      color: var(--text-sub);
+      position: relative;
+      transition: background 0.3s, color 0.3s;
+    }
+    ol.goal-list li::before {
+      content: counter(goal-counter);
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      background: #764ba2; color: white;
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+    }
+
+    .quote-box {
+      background: var(--quote-bg);
+      border-radius: 12px;
+      padding: 20px 24px;
+      transition: background 0.3s;
+    }
+    .quote-box p { margin-bottom: 8px; }
+    .quote-box p:last-child { margin-bottom: 0; }
+
+    .contact-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: var(--contact-bg);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: var(--text-sub);
+      transition: background 0.2s, color 0.3s;
+    }
+    .contact-item:hover { background: var(--contact-hover); }
+    .contact-icon { font-size: 1.2rem; width: 30px; text-align: center; }
+    .contact-label { font-size: 0.8rem; color: var(--footer-text); }
+    .contact-value { color: #667eea; font-weight: 600; }
+
+    .footer {
+      text-align: center;
+      padding: 24px;
+      background: var(--footer-bg);
+      border-top: 1px solid var(--footer-border);
+      color: var(--footer-text);
+      font-size: 0.82rem;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 다크/라이트 토글 스위치 -->
+  <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드 전환">
+    <span id="toggleEmoji">🌙</span>
+    <div class="toggle-track">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span id="toggleLabel">다크</span>
+  </div>
+
+  <div class="card">
+
+    <div class="header">
+      <div class="avatar">👋</div>
+      <h1>홍길동</h1>
+      <p>웹 개발을 공부 중인 서울 청년</p>
+    </div>
+
+    <div class="content">
+
+      <div class="section">
+        <h2>자기소개</h2>
+        <p>안녕하세요! 저는 서울에 살고 있는 홍길동입니다.</p>
+        <p>현재 웹 개발에 관심을 가지고 공부 중입니다.</p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <h2>관심사</h2>
+        <ul class="interest-list">
+          <li>웹 개발 배우기</li>
+          <li>영화 감상</li>
+          <li>맛집 탐방</li>
+          <li>운동 (헬스, 러닝)</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <h2>올해의 목표</h2>
+        <ol class="goal-list">
+          <li>HTML 기초 익히기</li>
+          <li>CSS로 예쁘게 꾸미기</li>
+          <li>나만의 홈페이지 완성하기</li>
+        </ol>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <h2>한마디</h2>
+        <div class="quote-box">
+          <p>저는 <b>성실함</b>을 가장 중요하게 생각합니다.</p>
+          <p>그리고 매일 <i>조금씩 성장</i>하는 것을 목표로 합니다.</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section">
+        <h2>연락처</h2>
+        <a class="contact-item" href="mailto:hong@example.com">
+          <span class="contact-icon">✉️</span>
+          <div>
+            <div class="contact-label">이메일</div>
+            <div class="contact-value">hong@example.com</div>
+          </div>
+        </a>
+        <a class="contact-item" href="https://www.youtube.com" target="_blank">
+          <span class="contact-icon">▶️</span>
+          <div>
+            <div class="contact-label">유튜브</div>
+            <div class="contact-value">유튜브 바로가기</div>
+          </div>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <small>© 2026 홍길동의 홈페이지. All rights reserved.</small>
+    </div>
+
+  </div>
+
+  <script>
+    // 저장된 테마 불러오기
+    const saved = localStorage.getItem('theme') || 'light';
+    applyTheme(saved);
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const isDark = theme === 'dark';
+      document.getElementById('toggleEmoji').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = isDark ? '라이트' : '다크';
+    }
+  </script>
+
+</body>
+</html>
