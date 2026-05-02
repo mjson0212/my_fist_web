@@ -24,9 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 저장소 루트 전체 배포 (기존 index.html·디즈니 페이지와 happy_house 함께 유지)
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: happy_house
+          path: .
 
       - id: deployment
         uses: actions/deploy-pages@v4
