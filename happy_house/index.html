@@ -263,6 +263,17 @@
       line-height: 1.5;
       padding: 8px;
     }
+    .sync-tip {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: #065f46;
+    }
+    .sync-tip strong { display: block; margin-bottom: 6px; font-size: 0.85rem; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -279,6 +290,12 @@
         <p class="names">상휘 · 민정</p>
         <p class="sub">출금가능 금액(D) 기준 · 엑셀 정리 문구와 동일한 로직</p>
       </header>
+
+      <div class="sync-tip" role="note">
+        <strong>폰이랑 PC 숫자가 다르게 나와요?</strong>
+        입금 내역은 <strong>그 브라우저 안에만</strong> 저장됩니다 (서버 동기화 없음).
+        한쪽에서 썼으면 <strong>설정 → 엑셀 내보내기</strong>로 파일 받은 뒤, 다른 기기에서는 <strong>엑셀 불러오기</strong>를 한 번 해 주세요.
+      </div>
 
       <div class="big-d">
         <div class="lbl">출금 가능 금액 (D)</div>
