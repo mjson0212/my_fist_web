@@ -9,6 +9,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase 콘솔(https://console.firebase.google.com)에서 프로젝트 만들고 웹 앱 추가 후 값 붙여넣기 -->
+  <script id="firebase-json" type="application/json">
+{
+  "apiKey": "",
+  "authDomain": "",
+  "projectId": "",
+  "storageBucket": "",
+  "messagingSenderId": "",
+  "appId": ""
+}
+  </script>
   <style>
     :root {
       --paper: #f4f1eb;
@@ -274,6 +287,15 @@
       color: #065f46;
     }
     .sync-tip strong { display: block; margin-bottom: 6px; font-size: 0.85rem; }
+    .fb-status {
+      font-size: 0.78rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+    .fb-status.off { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .fb-status.on { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -292,9 +314,9 @@
       </header>
 
       <div class="sync-tip" role="note">
-        <strong>폰이랑 PC 숫자가 다르게 나와요?</strong>
-        입금 내역은 <strong>그 브라우저 안에만</strong> 저장됩니다 (서버 동기화 없음).
-        한쪽에서 썼으면 <strong>설정 → 엑셀 내보내기</strong>로 파일 받은 뒤, 다른 기기에서는 <strong>엑셀 불러오기</strong>를 한 번 해 주세요.
+        <strong>폰 · PC 동시에 맞추려면</strong>
+        <strong>설정 → 클라우드 동기화</strong>에서 Firebase 값과 같은 방 코드를 넣으면 인터넷에 저장되며 여러 기기에서 바로 반영됩니다.
+        연결 안 하면 예전처럼 이 브라우저에만 저장됩니다 · 필요하면 엑셀도 계속 쓸 수 있어요.
       </div>
 
       <div class="big-d">
@@ -365,6 +387,31 @@
         </p>
       </div>
 
+      <div class="card">
+        <h3>클라우드 동기화 (Firebase)</h3>
+        <p class="note" style="text-align:left;margin:0 0 10px;line-height:1.55">
+          <strong>1)</strong> <a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a>에서 무료 프로젝트 만들기 → 웹 앱 추가<br />
+          <strong>2)</strong> 프로젝트 설정에서 설정 객체 복사 후, 이 파일 상단의 <code>&lt;script id="firebase-json"&gt;</code> 안에 붙여넣고 깃에 푸시<br />
+          <strong>3)</strong> Firestore 만들기 → <strong>규칙</strong>에 아래 전체 붙여 넣고 게시 (가족용 간단 규칙):
+          <pre style="font-size:0.62rem;margin:8px 0;padding:8px;background:#f5f5f4;border-radius:8px;overflow:auto">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /happy_house_sync/{docId} {
+      allow read, write: if docId.size() &gt;= 16;
+    }
+  }
+}</pre>
+          <strong>4)</strong> 부부만 아는 <strong>방 코드</strong> (영숫자 16자 이상, 같은 값 입력):
+        </p>
+        <label class="f" for="fb-room">방 코드 (가족 공통)</label>
+        <input type="text" id="fb-room" autocomplete="off" placeholder="예: hwjung82kimLee0927happy" />
+        <button type="button" class="btn secondary" id="btn-fb-connect">연결 · 클라우드에 저장하기</button>
+        <button type="button" class="btn ghost" id="btn-fb-disconnect" style="margin-top:8px">동기화 끄기 (로컬만)</button>
+        <div id="fb-status" class="fb-status off">
+          Firebase가 설정되지 않았거나 연결 전입니다.
+        </div>
+      </div>
+
       <div class="card settings-grid">
         <h3>마이너스 통장</h3>
         <label class="f">마통 대출·시설 금액 (받은 한도)</label>
@@ -424,9 +471,9 @@
       <div class="card" style="margin-top:14px">
         <h3>데이터는 어디에 저장되나요?</h3>
         <p class="note" style="text-align:left;margin:0;line-height:1.6">
-          기본은 <strong>이 기기 브라우저(localStorage)</strong>입니다.<br />
-          깃으로 맞추려면 위에서 엑셀을 내보내서 저장소에 커밋하거나, 받은 엑셀을 불러오면 됩니다.<br />
-          브라우저 데이터만 지우면 로컬 기록이 날아갈 수 있어요 · 중요하면 엑셀 백업을 자주 하세요.
+          <strong>클라우드 연결 시:</strong> 설정·입금 내역이 <strong>Firebase Firestore</strong>(구글 서버)에도 저장되며, 같은 방 코드를 쓴 기기에 실시간 반영됩니다.<br />
+          동시에 이 브라우저에도 복사해 두어 빠르게 열 수 있습니다.<br />
+          엑셀 내보내기는 그대로 백업용으로 쓸 수 있어요.
         </p>
       </div>
     </div>
@@ -439,6 +486,158 @@
       var KEY_SETTINGS = "happy_house_settings_v1";
       var KEY_LEDGER = "happy_house_ledger_v4";
       var KEY_LEGACY = "happy_house_ledger_v3";
+      var KEY_FB_ROOM = "happy_house_firestore_room_v1";
+
+      var firestoreDb = null;
+      var fbListenerUnsub = null;
+      var cloudPushTimer = null;
+      var ignoreRemoteUntil = 0;
+
+      function readFirebaseJsonCfg() {
+        try {
+          var el = document.getElementById("firebase-json");
+          if (!el) return null;
+          var o = JSON.parse(el.textContent);
+          if (
+            o &&
+            typeof o.apiKey === "string" &&
+            o.apiKey.length > 8 &&
+            typeof o.projectId === "string" &&
+            o.projectId.length > 0
+          )
+            return o;
+        } catch (e) {}
+        return null;
+      }
+
+      function sanitizeRoomKey(s) {
+        return String(s || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 120);
+      }
+
+      function initFirestoreDb() {
+        var cfg = readFirebaseJsonCfg();
+        if (!cfg || typeof firebase === "undefined") return null;
+        try {
+          if (!firebase.apps.length) firebase.initializeApp(cfg);
+          return firebase.firestore();
+        } catch (e) {
+          console.warn(e);
+          return null;
+        }
+      }
+
+      function detachFirestoreListener() {
+        if (typeof fbListenerUnsub === "function") {
+          fbListenerUnsub();
+          fbListenerUnsub = null;
+        }
+      }
+
+      function attachFirestoreListener() {
+        detachFirestoreListener();
+        firestoreDb = initFirestoreDb();
+        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
+        if (!firestoreDb || !room || room.length < 16) return false;
+
+        fbListenerUnsub = firestoreDb
+          .collection("happy_house_sync")
+          .doc(room)
+          .onSnapshot(function (snap) {
+            if (Date.now() < ignoreRemoteUntil) return;
+            if (!snap.exists) return;
+            var d = snap.data();
+            if (!d || typeof d.settingsJson !== "string") return;
+            try {
+              var rs = JSON.parse(d.settingsJson);
+              var rl = JSON.parse(d.ledgerJson || "[]");
+              rl = rl.map(normalizeLedgerEntry).filter(Boolean);
+              if (
+                JSON.stringify(rs) === JSON.stringify(loadSettings()) &&
+                JSON.stringify(rl) === JSON.stringify(loadLedger())
+              )
+                return;
+              saveSettings(rs);
+              saveLedger(rl);
+              fillSettingsForm();
+              render();
+            } catch (e) {
+              console.warn(e);
+            }
+          });
+        return true;
+      }
+
+      function scheduleCloudPush() {
+        var cfg = readFirebaseJsonCfg();
+        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
+        if (!cfg || !room || room.length < 16) return;
+
+        var db = firestoreDb || initFirestoreDb();
+        if (!db) return;
+        firestoreDb = db;
+
+        ignoreRemoteUntil = Date.now() + 2500;
+        clearTimeout(cloudPushTimer);
+        cloudPushTimer = setTimeout(function () {
+          db.collection("happy_house_sync")
+            .doc(room)
+            .set({
+              settingsJson: JSON.stringify(loadSettings()),
+              ledgerJson: JSON.stringify(loadLedger()),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .catch(function (e) {
+              console.warn(e);
+              updateFbStatus("클라우드 저장 실패: " + e.message, false);
+            });
+        }, 500);
+      }
+
+      function persistSettings(s) {
+        saveSettings(s);
+        scheduleCloudPush();
+      }
+
+      function persistLedger(a) {
+        saveLedger(a);
+        scheduleCloudPush();
+      }
+
+      function updateFbStatus(text, ok) {
+        var el = document.getElementById("fb-status");
+        if (!el) return;
+        el.textContent = text;
+        el.className = "fb-status " + (ok ? "on" : "off");
+      }
+
+      function refreshFbUi() {
+        var inp = document.getElementById("fb-room");
+        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
+        if (inp) inp.value = room || "";
+
+        if (!readFirebaseJsonCfg()) {
+          updateFbStatus(
+            "Firebase 설정(apiKey·projectId 등)을 이 페이지 상단 firebase-json에 넣어 주세요.",
+            false
+          );
+          return;
+        }
+        if (!room || room.length < 16) {
+          updateFbStatus("방 코드 16자 이상 입력 후 「연결」을 누르세요.", false);
+          return;
+        }
+        firestoreDb = initFirestoreDb();
+        if (!firestoreDb) {
+          updateFbStatus("Firebase 초기화 실패 · 설정 JSON 확인", false);
+          return;
+        }
+        attachFirestoreListener();
+        scheduleCloudPush();
+        updateFbStatus(
+          "연결됨 · 클라우드 저장 중 (방 " + room.slice(0, 10) + "…)",
+          true
+        );
+      }
 
       var defaultSettings = function () {
         return {
@@ -765,7 +964,7 @@
         log.querySelectorAll(".del").forEach(function (btn) {
           btn.onclick = function () {
             var id = btn.closest(".log-row").getAttribute("data-id");
-            saveLedger(loadLedger().filter(function (x) {
+            persistLedger(loadLedger().filter(function (x) {
               return x.id !== id;
             }));
             render();
@@ -796,6 +995,9 @@
         document.getElementById("m2-k").value = formatCommaDisplay(
           s.milestones[1].cumulative
         );
+        var fbr = document.getElementById("fb-room");
+        if (fbr)
+          fbr.value = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM)) || "";
       }
 
       document.querySelectorAll(".tabs button").forEach(function (b) {
@@ -830,7 +1032,7 @@
           amount: amt,
           kind: kind
         });
-        saveLedger(list);
+        persistLedger(list);
         document.getElementById("tx-amt").value = "";
         render();
       });
@@ -853,7 +1055,7 @@
             }
           ]
         };
-        saveSettings(s);
+        persistSettings(s);
         alert("저장했습니다");
         render();
       });
@@ -1049,6 +1251,7 @@
               }
             }
             saveLedger(newLedger);
+            scheduleCloudPush();
             alert("불러오기 완료했습니다.");
             fillSettingsForm();
             render();
@@ -1083,6 +1286,31 @@
         });
       })();
 
+      document.getElementById("btn-fb-connect").addEventListener("click", function () {
+        var room = sanitizeRoomKey(document.getElementById("fb-room").value);
+        if (room.length < 16) {
+          alert("방 코드는 영숫자·-_ 만 사용하고 16자 이상으로 정해 주세요.");
+          return;
+        }
+        if (!readFirebaseJsonCfg()) {
+          alert(
+            "index.html 상단의 firebase-json 안에 Firebase 웹 앱 설정을 먼저 넣어 주세요."
+          );
+          return;
+        }
+        localStorage.setItem(KEY_FB_ROOM, room);
+        refreshFbUi();
+      });
+
+      document.getElementById("btn-fb-disconnect").addEventListener("click", function () {
+        localStorage.removeItem(KEY_FB_ROOM);
+        detachFirestoreListener();
+        firestoreDb = null;
+        document.getElementById("fb-room").value = "";
+        updateFbStatus("동기화 끔 · 이 브라우저 로컬만 사용합니다.", false);
+      });
+
+      refreshFbUi();
       render();
     })();
   </script>
