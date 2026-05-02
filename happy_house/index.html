@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f1eb" />
+  <title>상휘 · 민정 — 중도금 · 마통</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --paper: #f4f1eb;
+      --card: #ffffff;
+      --ink: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --green: #059669;
+      --navy: #1e3a5f;
+      --amber: #d97706;
+      --danger: #b91c1c;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(28, 25, 23, 0.06);
+      --font: "Noto Sans KR", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      background: var(--paper);
+      color: var(--ink);
+      padding: max(10px, env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+    }
+    .wrap { max-width: 460px; margin: 0 auto; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 4px;
+      background: #e7e5e4;
+      border-radius: 14px;
+    }
+    .tabs button {
+      flex: 1;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 12px;
+      border: none;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .tabs button.on {
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .page { display: none; }
+    .page.on { display: block; }
+
+    .hero { text-align: center; padding: 4px 0 14px; }
+    .hero .names { font-size: 1.45rem; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
+    .hero .sub { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    .big-d {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .big-d .lbl { font-size: 0.72rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .big-d .num {
+      font-size: clamp(1.6rem, 7vw, 2rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--navy);
+      letter-spacing: -0.03em;
+    }
+    .big-d .num.bad { color: var(--danger); }
+    .big-d .subnum {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-pill {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: #fff7ed;
+      color: var(--amber);
+      border: 1px solid #fed7aa;
+    }
+    .status-pill.ok {
+      background: #ecfdf5;
+      color: var(--green);
+      border-color: #a7f3d0;
+    }
+
+    .formula-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+      word-break: keep-all;
+    }
+    .formula-box strong { color: #92400e; }
+
+    .gauge-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+    }
+    .gauge-card .t {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+    }
+    .gauge-card .t span:first-child { font-weight: 700; }
+    .gauge-card .t span:last-child {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .gauge-bar {
+      height: 12px;
+      border-radius: 999px;
+      background: #f5f5f4;
+      overflow: hidden;
+    }
+    .gauge-bar > i {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+    .gauge-bar.total > i {
+      background: linear-gradient(90deg, #059669, #34d399);
+    }
+
+    table.ms {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      margin-top: 8px;
+    }
+    table.ms th, table.ms td {
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    table.ms th { color: var(--muted); font-weight: 600; }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card h3 { margin: 0 0 12px; font-size: 0.95rem; }
+
+    label.f {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    input, select, textarea {
+      width: 100%;
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fafaf9;
+      margin-bottom: 10px;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn {
+      font: inherit;
+      font-weight: 700;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn.secondary { background: var(--navy); }
+    .btn.ghost {
+      background: #f5f5f4;
+      color: var(--ink);
+      font-size: 0.85rem;
+      padding: 10px;
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.84rem;
+    }
+    .log-row:last-child { border-bottom: none; }
+    .tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .tag.pm { background: #e0e7f0; color: var(--navy); }
+    .tag.di { background: #d1fae5; color: #065f46; }
+    .tag.po { background: #fef3c7; color: #92400e; }
+    .tag.ug { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+    .del {
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .settings-grid .hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin: -6px 0 12px;
+      line-height: 1.45;
+    }
+
+    footer.note {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+      padding: 8px;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="tabs" role="tablist">
+      <button type="button" class="on" data-page="main">메인</button>
+      <button type="button" data-page="settings">설정</button>
+    </nav>
+
+    <!-- 메인 -->
+    <div id="page-main" class="page on">
+      <header class="hero">
+        <p class="names">상휘 · 민정</p>
+        <p class="sub">출금가능 금액(D) 기준 · 엑셀 정리 문구와 동일한 로직</p>
+      </header>
+
+      <div class="big-d">
+        <div class="lbl">출금 가능 금액 (D)</div>
+        <div class="num" id="disp-d">—</div>
+        <div class="subnum" id="disp-d-sub"></div>
+        <div id="pill-wrap"></div>
+      </div>
+
+      <div class="formula-box" id="formula-text"></div>
+
+      <div class="gauge-card">
+        <div class="t">
+          <span id="g-title">6차 누적 목표까지</span>
+          <span id="g-meta"></span>
+        </div>
+        <div class="gauge-bar total"><i id="g-bar" style="width:0%"></i></div>
+      </div>
+
+      <div class="card">
+        <h3>차수 일정 (참고)</h3>
+        <table class="ms" id="ms-table"></table>
+      </div>
+
+      <div class="card">
+        <h3>입금·출금 기록</h3>
+        <div class="row2">
+          <div>
+            <label class="f" for="tx-date">기준일</label>
+            <input type="date" id="tx-date" />
+          </div>
+          <div>
+            <label class="f" for="tx-amt">금액</label>
+            <input type="text" id="tx-amt" inputmode="numeric" placeholder="숫자" />
+          </div>
+        </div>
+        <label class="f" for="tx-kind">종류</label>
+        <select id="tx-kind">
+          <option value="deposit_minus">마통에 입금 (월급·저축 등 → D 증가)</option>
+          <option value="pay_minus">마통에서 중도금 납부 (→ D 감소)</option>
+          <option value="use_urgent">급하게 인출·사용 (생활비 등 → D 감소)</option>
+          <option value="pay_other">카드·현금·타계좌로 중도금 (D 변동 없음)</option>
+        </select>
+        <button type="button" class="btn" id="btn-add">추가</button>
+      </div>
+
+      <div class="card">
+        <h3>내역 · 최신순</h3>
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <!-- 설정 -->
+    <div id="page-settings" class="page">
+      <header class="hero">
+        <p class="names">설정</p>
+        <p class="sub">폰에서는 아래 주소만 즐겨찾기 · 깃에 올리면 인터넷 URL로 열립니다</p>
+      </header>
+
+      <div class="card">
+        <h3>이 페이지 주소</h3>
+        <input type="text" readonly id="page-url" style="font-size:0.8rem;margin-bottom:8px" />
+        <button type="button" class="btn ghost" id="btn-copy-url">주소 복사</button>
+        <p class="note" style="text-align:left;margin:10px 0 0;line-height:1.55">
+          GitHub에 푸시하고 Pages를 켜면 이 주소가
+          <code>https://아이디.github.io/저장소이름/</code> 형태가 됩니다.
+          각자 폰 브라우저에서 이 URL만 열면 됩니다.
+        </p>
+      </div>
+
+      <div class="card settings-grid">
+        <h3>마이너스 통장</h3>
+        <label class="f">마통 대출·시설 금액 (받은 한도)</label>
+        <input type="text" id="set-loan" inputmode="numeric" />
+        <label class="f">현재 마통 잔액 (음수 그대로)</label>
+        <input type="text" id="set-balance" inputmode="numeric" placeholder="-63769347" />
+        <p class="hint">출금가능은 보통 한도 − 빌린 만큼입니다. 아래 기준값과 다르면 직접 맞추세요.</p>
+        <label class="f">출금가능 기준값 D₀ (시작 시점)</label>
+        <input type="text" id="set-d0" inputmode="numeric" placeholder="6530653" />
+        <button type="button" class="btn ghost" id="btn-estimate">대출 − |잔액| 으로 출금가능 추정</button>
+      </div>
+
+      <div class="card">
+        <h3>차수 목표 (엑셀 K₂ K₃)</h3>
+        <div class="row2">
+          <div>
+            <label class="f">5차 입금일</label>
+            <input type="date" id="m1-date" />
+          </div>
+          <div>
+            <label class="f">5차 누적 목표 (K₂)</label>
+            <input type="text" id="m1-k" inputmode="numeric" />
+          </div>
+        </div>
+        <div class="row2">
+          <div>
+            <label class="f">6차 입금일</label>
+            <input type="date" id="m2-date" />
+          </div>
+          <div>
+            <label class="f">6차 누적 목표 (K₃)</label>
+            <input type="text" id="m2-k" inputmode="numeric" />
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn secondary" id="btn-save-settings">설정 저장</button>
+      <p class="note" style="margin-top:12px">
+        메인의 D = D₀ + 마통입금 − (마통납부 + 급사용) · 카드 중도납부는 D 유지
+      </p>
+
+      <div class="card" style="margin-top:14px">
+        <h3>엑셀로 저장 · 깃에서 같이 보기</h3>
+        <p class="note" style="text-align:left;margin:0 0 12px;line-height:1.6">
+          <strong>내보내기</strong>로 <code>happy_house_data.xlsx</code> 저장 후 깃에 같이 올리면 두 사람이 같은 표를 볼 수 있어요.
+          웹만 열었을 때 숫자가 비어 있으면 여기서 <strong>불러오기</strong> 한 번 하면 됩니다.
+        </p>
+        <button type="button" class="btn secondary" id="btn-export-xlsx">
+          엑셀 파일로 내보내기
+        </button>
+        <label class="btn ghost" style="display:block;margin-top:10px;text-align:center;cursor:pointer;padding:12px;border-radius:12px">
+          엑셀 파일 불러오기
+          <input type="file" id="import-xlsx" accept=".xlsx,.xls" class="hidden" />
+        </label>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>데이터는 어디에 저장되나요?</h3>
+        <p class="note" style="text-align:left;margin:0;line-height:1.6">
+          기본은 <strong>이 기기 브라우저(localStorage)</strong>입니다.<br />
+          깃으로 맞추려면 위에서 엑셀을 내보내서 저장소에 커밋하거나, 받은 엑셀을 불러오면 됩니다.<br />
+          브라우저 데이터만 지우면 로컬 기록이 날아갈 수 있어요 · 중요하면 엑셀 백업을 자주 하세요.
+        </p>
+      </div>
+    </div>
+
+    <footer class="note">숫자 입력 시 세 자리마다 콤마가 붙습니다 · 포커스 시 콤마는 잠깐 빠집니다</footer>
+  </div>
+
+  <script>
+    (function () {
+      var KEY_SETTINGS = "happy_house_settings_v1";
+      var KEY_LEDGER = "happy_house_ledger_v4";
+      var KEY_LEGACY = "happy_house_ledger_v3";
+
+      var defaultSettings = function () {
+        return {
+          loanAmount: 70030000,
+          minusBalance: -63769347,
+          withdrawBaseline: 6530653,
+          milestones: [
+            { phase: "5차", dueDate: "2027-12-10", cumulative: 75520000 },
+            { phase: "6차", dueDate: "2028-03-10", cumulative: 151040000 }
+          ]
+        };
+      };
+
+      function loadSettings() {
+        try {
+          var r = localStorage.getItem(KEY_SETTINGS);
+          if (!r) return defaultSettings();
+          var o = JSON.parse(r);
+          var d = defaultSettings();
+          return {
+            loanAmount: Number(o.loanAmount) || d.loanAmount,
+            minusBalance: Number(o.minusBalance) || d.minusBalance,
+            withdrawBaseline: Number(o.withdrawBaseline) || d.withdrawBaseline,
+            milestones: Array.isArray(o.milestones) && o.milestones.length >= 2
+              ? o.milestones
+              : d.milestones
+          };
+        } catch (e) {
+          return defaultSettings();
+        }
+      }
+
+      function saveSettings(s) {
+        localStorage.setItem(KEY_SETTINGS, JSON.stringify(s));
+      }
+
+      function normalizeLedgerEntry(e) {
+        if (!e || typeof e !== "object") return null;
+        if (
+          e.kind === "deposit_minus" ||
+          e.kind === "pay_minus" ||
+          e.kind === "pay_other" ||
+          e.kind === "use_urgent"
+        )
+          return e;
+        if (e.source === "minus") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_minus" };
+        if (e.source === "card") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
+        if (e.source === "other") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
+        if (e.fromMinus !== false) return { id: e.id, date: e.date, amount: e.amount, kind: "pay_minus" };
+        return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
+      }
+
+      function loadLedger() {
+        try {
+          var raw = localStorage.getItem(KEY_LEDGER);
+          var arr;
+          if (raw) {
+            arr = JSON.parse(raw);
+          } else {
+            var leg = localStorage.getItem(KEY_LEGACY);
+            arr = leg ? JSON.parse(leg) : [];
+            arr = Array.isArray(arr) ? arr.map(normalizeLedgerEntry).filter(Boolean) : [];
+            if (arr.length) {
+              saveLedger(arr);
+            }
+          }
+          if (!Array.isArray(arr)) return [];
+          arr = arr.map(normalizeLedgerEntry).filter(Boolean);
+          return arr;
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveLedger(a) {
+        localStorage.setItem(KEY_LEDGER, JSON.stringify(a));
+      }
+
+      function money(n) {
+        if (n == null || isNaN(n)) return "—";
+        return new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
+      }
+
+      function parseNum(s) {
+        var t = String(s || "").replace(/,/g, "").replace(/\s/g, "");
+        if (t === "" || t === "-") return 0;
+        var n = parseInt(t, 10);
+        return isNaN(n) ? 0 : n;
+      }
+
+      function formatCommaDisplay(n) {
+        if (n === null || n === undefined || n === "") return "";
+        var num = typeof n === "number" ? n : parseNum(String(n));
+        if (isNaN(num)) return "";
+        var neg = num < 0;
+        var f = new Intl.NumberFormat("ko-KR").format(Math.abs(num));
+        return neg ? "-" + f : f;
+      }
+
+      /** 금액 입력: 입력 중·블러 시 콤마 · 포커스 시 숫자만 */
+      function bindMoneyInput(el, allowNegative) {
+        if (!el) return;
+        allowNegative = !!allowNegative;
+        el.addEventListener("focus", function () {
+          var t = String(el.value).replace(/,/g, "").trim();
+          if (t === "") return;
+          el.value = t;
+        });
+        el.addEventListener("blur", function () {
+          var t = String(el.value).replace(/,/g, "").trim();
+          if (t === "" || (allowNegative && t === "-")) {
+            if (t !== "-") el.value = "";
+            return;
+          }
+          var n = parseInt(t, 10);
+          if (isNaN(n)) return;
+          el.value = formatCommaDisplay(n);
+        });
+        el.addEventListener("input", function () {
+          var raw = String(el.value).replace(/,/g, "");
+          if (allowNegative) {
+            var neg = false;
+            var rest = raw;
+            if (rest.indexOf("-") === 0) {
+              neg = true;
+              rest = rest.slice(1);
+            }
+            rest = rest.replace(/\D/g, "");
+            if (rest === "" && !neg) {
+              el.value = "";
+              return;
+            }
+            if (rest === "" && neg) {
+              el.value = "-";
+              return;
+            }
+            var n1 = parseInt(rest, 10);
+            if (isNaN(n1)) return;
+            if (neg) n1 = -n1;
+            el.value = formatCommaDisplay(n1);
+          } else {
+            var digits = raw.replace(/\D/g, "");
+            if (digits === "") {
+              el.value = "";
+              return;
+            }
+            var n2 = parseInt(digits, 10);
+            if (isNaN(n2)) return;
+            el.value = formatCommaDisplay(n2);
+          }
+        });
+      }
+
+      function todayISO() {
+        var d = new Date();
+        var z = function (x) {
+          return (x < 10 ? "0" : "") + x;
+        };
+        return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate());
+      }
+
+      function monthDiff(startIso, endIso) {
+        var a = new Date(startIso + "T12:00:00");
+        var b = new Date(endIso + "T12:00:00");
+        if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+        if (a > b) return 0;
+        var m =
+          (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+        return Math.max(0, m);
+      }
+
+      function sumKind(entries, kind) {
+        return entries.reduce(function (a, e) {
+          if (e.kind === kind) return a + (Number(e.amount) || 0);
+          return a;
+        }, 0);
+      }
+
+      function computeD(settings, entries) {
+        var d0 = Number(settings.withdrawBaseline) || 0;
+        var add = sumKind(entries, "deposit_minus");
+        var sub =
+          sumKind(entries, "pay_minus") + sumKind(entries, "use_urgent");
+        return d0 + add - sub;
+      }
+
+      /** 엑셀 F열과 동일 */
+      function excelSummary(Aiso, D, m0, m1) {
+        var K2 = Number(m0.cumulative) || 0;
+        var K3 = Number(m1.cumulative) || 0;
+        var H2 = m0.phase || "5차";
+        var H3 = m1.phase || "6차";
+        var I2 = m0.dueDate;
+        var I3 = m1.dueDate;
+
+        if (D >= K3) return { text: "완료", done: true };
+
+        function part(H, Kneed, Iend) {
+          var need = Kneed - D;
+          var months = monthDiff(Aiso, Iend);
+          var datePart =
+            Aiso > Iend ? "목표일 경과" : months + "개월 남음";
+          return (
+            H +
+            " " +
+            new Intl.NumberFormat("ko-KR").format(Math.max(0, Math.round(need))) +
+            "원 필요 / " +
+            datePart
+          );
+        }
+
+        if (D >= K2) {
+          return { text: part(H3, K3, I3), done: false };
+        }
+        return { text: part(H2, K2, I2), done: false };
+      }
+
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function render() {
+        var settings = loadSettings();
+        var entries = loadLedger();
+        var D = computeD(settings, entries);
+
+        var m = settings.milestones;
+        var m0 = m[0];
+        var m1 = m[1];
+        var K3 = Number(m1.cumulative) || 1;
+
+        var refDate = document.getElementById("tx-date").value || todayISO();
+        var sum = excelSummary(refDate, D, m0, m1);
+
+        document.getElementById("disp-d").textContent = money(D);
+        document.getElementById("disp-d").className = "num" + (D < 0 ? " bad" : "");
+        document.getElementById("disp-d-sub").textContent =
+          "D₀ " +
+          money(settings.withdrawBaseline) +
+          " · 마통입금 +" +
+          money(sumKind(entries, "deposit_minus")) +
+          " · 납부 −" +
+          money(sumKind(entries, "pay_minus")) +
+          " · 급사용 −" +
+          money(sumKind(entries, "use_urgent"));
+
+        var pill = document.getElementById("pill-wrap");
+        if (sum.done) {
+          pill.innerHTML =
+            '<span class="status-pill ok">달성 · 6차 누적(K₃) 이상</span>';
+        } else {
+          pill.innerHTML = '<span class="status-pill">미달성</span>';
+        }
+
+        document.getElementById("formula-text").innerHTML =
+          "<strong>정리</strong> · " + escapeHtml(sum.text);
+
+        var pct = Math.min(100, Math.max(0, (D / K3) * 100));
+        document.getElementById("g-bar").style.width = pct + "%";
+        document.getElementById("g-title").textContent =
+          "6차 누적 목표 (" + money(K3) + ") 까지";
+        document.getElementById("g-meta").textContent =
+          Math.round(pct) +
+          "% 채움 · " +
+          money(Math.max(0, K3 - D)) +
+          " 남음";
+
+        document.getElementById("ms-table").innerHTML =
+          "<thead><tr><th>차수</th><th>입금일</th><th>누적 목표</th></tr></thead><tbody>" +
+          "<tr><td>" +
+          escapeHtml(m0.phase) +
+          "</td><td>" +
+          m0.dueDate +
+          "</td><td>" +
+          money(m0.cumulative) +
+          "</td></tr>" +
+          "<tr><td>" +
+          escapeHtml(m1.phase) +
+          "</td><td>" +
+          m1.dueDate +
+          "</td><td>" +
+          money(m1.cumulative) +
+          "</td></tr></tbody>";
+
+        var sorted = entries.slice().sort(function (a, b) {
+          if (String(b.date) !== String(a.date))
+            return String(b.date).localeCompare(String(a.date));
+          return String(b.id).localeCompare(String(a.id));
+        });
+
+        var log = document.getElementById("log");
+        if (!sorted.length) {
+          log.innerHTML =
+            '<p style="color:#78716c;font-size:0.85rem">내역 없음 · 월급 넣었으면 「마통에 입금」</p>';
+        } else {
+          log.innerHTML = sorted
+            .map(function (e) {
+              var tag =
+                e.kind === "deposit_minus"
+                  ? '<span class="tag di">마통입금</span>'
+                  : e.kind === "pay_minus"
+                    ? '<span class="tag pm">마통납부</span>'
+                    : e.kind === "use_urgent"
+                      ? '<span class="tag ug">급사용</span>'
+                      : '<span class="tag po">카드등</span>';
+              return (
+                '<div class="log-row" data-id="' +
+                escapeHtml(e.id) +
+                '"><div><strong>' +
+                money(Number(e.amount)) +
+                "</strong><br /><small style=color:#78716c>" +
+                e.date +
+                "</small></div>" +
+                tag +
+                '<button type="button" class="del">삭제</button></div>'
+              );
+            })
+            .join("");
+        }
+
+        log.querySelectorAll(".del").forEach(function (btn) {
+          btn.onclick = function () {
+            var id = btn.closest(".log-row").getAttribute("data-id");
+            saveLedger(loadLedger().filter(function (x) {
+              return x.id !== id;
+            }));
+            render();
+          };
+        });
+
+        if (!document.getElementById("tx-date").dataset.touched) {
+          document.getElementById("tx-date").value = todayISO();
+        }
+      }
+
+      function fillSettingsForm() {
+        var s = loadSettings();
+        document.getElementById("set-loan").value = formatCommaDisplay(
+          s.loanAmount
+        );
+        document.getElementById("set-balance").value = formatCommaDisplay(
+          s.minusBalance
+        );
+        document.getElementById("set-d0").value = formatCommaDisplay(
+          s.withdrawBaseline
+        );
+        document.getElementById("m1-date").value = s.milestones[0].dueDate;
+        document.getElementById("m1-k").value = formatCommaDisplay(
+          s.milestones[0].cumulative
+        );
+        document.getElementById("m2-date").value = s.milestones[1].dueDate;
+        document.getElementById("m2-k").value = formatCommaDisplay(
+          s.milestones[1].cumulative
+        );
+      }
+
+      document.querySelectorAll(".tabs button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var p = b.getAttribute("data-page");
+          document.querySelectorAll(".tabs button").forEach(function (x) {
+            x.classList.toggle("on", x === b);
+          });
+          document.querySelectorAll(".page").forEach(function (pg) {
+            pg.classList.toggle("on", pg.id === "page-" + p);
+          });
+          if (p === "settings") fillSettingsForm();
+        });
+      });
+
+      document.getElementById("tx-date").addEventListener("change", function () {
+        document.getElementById("tx-date").dataset.touched = "1";
+        render();
+      });
+
+      document.getElementById("btn-add").addEventListener("click", function () {
+        var amt = parseNum(document.getElementById("tx-amt").value);
+        if (amt <= 0) return;
+        var kind = document.getElementById("tx-kind").value;
+        var okKinds =
+          "deposit_minus,pay_minus,pay_other,use_urgent".split(",");
+        if (okKinds.indexOf(kind) === -1) kind = "pay_other";
+        var list = loadLedger();
+        list.push({
+          id: "t-" + Date.now(),
+          date: document.getElementById("tx-date").value || todayISO(),
+          amount: amt,
+          kind: kind
+        });
+        saveLedger(list);
+        document.getElementById("tx-amt").value = "";
+        render();
+      });
+
+      document.getElementById("btn-save-settings").addEventListener("click", function () {
+        var s = {
+          loanAmount: parseNum(document.getElementById("set-loan").value),
+          minusBalance: parseNum(document.getElementById("set-balance").value),
+          withdrawBaseline: parseNum(document.getElementById("set-d0").value),
+          milestones: [
+            {
+              phase: "5차",
+              dueDate: document.getElementById("m1-date").value || "2027-12-10",
+              cumulative: parseNum(document.getElementById("m1-k").value)
+            },
+            {
+              phase: "6차",
+              dueDate: document.getElementById("m2-date").value || "2028-03-10",
+              cumulative: parseNum(document.getElementById("m2-k").value)
+            }
+          ]
+        };
+        saveSettings(s);
+        alert("저장했습니다");
+        render();
+      });
+
+      document.getElementById("btn-estimate").addEventListener("click", function () {
+        var loan = parseNum(document.getElementById("set-loan").value);
+        var bal = parseNum(document.getElementById("set-balance").value);
+        var est = loan - Math.abs(bal);
+        document.getElementById("set-d0").value = formatCommaDisplay(est);
+      });
+
+      bindMoneyInput(document.getElementById("tx-amt"), false);
+      bindMoneyInput(document.getElementById("set-loan"), false);
+      bindMoneyInput(document.getElementById("set-balance"), true);
+      bindMoneyInput(document.getElementById("set-d0"), false);
+      bindMoneyInput(document.getElementById("m1-k"), false);
+      bindMoneyInput(document.getElementById("m2-k"), false);
+
+      function kindToKo(k) {
+        var map = {
+          deposit_minus: "마통입금",
+          pay_minus: "마통납부",
+          use_urgent: "급사용",
+          pay_other: "카드등"
+        };
+        return map[k] || k;
+      }
+
+      function koToKind(s) {
+        var map = {
+          마통입금: "deposit_minus",
+          마통납부: "pay_minus",
+          급사용: "use_urgent",
+          카드등: "pay_other"
+        };
+        var t = String(s || "").trim();
+        if (map[t]) return map[t];
+        if (
+          ["deposit_minus", "pay_minus", "use_urgent", "pay_other"].indexOf(t) >=
+          0
+        )
+          return t;
+        return "pay_other";
+      }
+
+      function excelSerialToISO(n) {
+        var utcDays = Math.floor(n - 25569);
+        var d = new Date(utcDays * 86400 * 1000);
+        var y = d.getUTCFullYear();
+        var m = String(d.getUTCMonth() + 1).padStart(2, "0");
+        var day = String(d.getUTCDate()).padStart(2, "0");
+        return y + "-" + m + "-" + day;
+      }
+
+      function normalizeImportedDate(v) {
+        if (v == null || v === "") return "";
+        if (v instanceof Date && !isNaN(v.getTime()))
+          return v.toISOString().slice(0, 10);
+        if (typeof v === "number") return excelSerialToISO(v);
+        var s = String(v).trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+        return s.slice(0, 10);
+      }
+
+      function exportToXlsx() {
+        if (typeof XLSX === "undefined") {
+          alert(
+            "엑셀 기능을 불러오지 못했습니다. 인터넷에 연결된 뒤 다시 시도하세요."
+          );
+          return;
+        }
+        var settings = loadSettings();
+        var ledger = loadLedger();
+        var wb = XLSX.utils.book_new();
+
+        var setupRows = [
+          ["항목", "값"],
+          ["loanAmount", settings.loanAmount],
+          ["minusBalance", settings.minusBalance],
+          ["withdrawBaseline", settings.withdrawBaseline],
+          ["m1_phase", settings.milestones[0].phase],
+          ["m1_dueDate", settings.milestones[0].dueDate],
+          ["m1_cumulative", settings.milestones[0].cumulative],
+          ["m2_phase", settings.milestones[1].phase],
+          ["m2_dueDate", settings.milestones[1].dueDate],
+          ["m2_cumulative", settings.milestones[1].cumulative]
+        ];
+        XLSX.utils.book_append_sheet(
+          wb,
+          XLSX.utils.aoa_to_sheet(setupRows),
+          "설정"
+        );
+
+        var rows = [["날짜", "금액", "종류", "ID"]];
+        ledger.forEach(function (e) {
+          rows.push([e.date, e.amount, kindToKo(e.kind), e.id]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "내역");
+
+        var D = computeD(settings, ledger);
+        var sum = excelSummary(
+          todayISO(),
+          D,
+          settings.milestones[0],
+          settings.milestones[1]
+        );
+        var snap = [
+          ["항목", "값"],
+          ["내보낸_시각_ISO", new Date().toISOString()],
+          ["출금가능_D", D],
+          ["정리", sum.text],
+          ["달성", sum.done ? "완료" : "진행중"]
+        ];
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(snap), "요약");
+
+        XLSX.writeFile(wb, "happy_house_data.xlsx");
+      }
+
+      function importFromXlsx(file) {
+        if (typeof XLSX === "undefined") {
+          alert("엑셀 기능을 불러오지 못했습니다.");
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          try {
+            var buf = new Uint8Array(ev.target.result);
+            var wb = XLSX.read(buf, { type: "array", cellDates: true });
+            var ss = wb.Sheets["설정"];
+            if (!ss) {
+              alert('시트「설정」이 없습니다. 이 앱에서 내보낸 xlsx인지 확인하세요.');
+              return;
+            }
+            var setupArr = XLSX.utils.sheet_to_json(ss, { header: 1 });
+            var kv = {};
+            for (var i = 1; i < setupArr.length; i++) {
+              var row = setupArr[i];
+              if (row && row[0] != null && row[0] !== "")
+                kv[String(row[0]).trim()] = row[1];
+            }
+            var def = defaultSettings();
+            var newSettings = {
+              loanAmount: Number(kv.loanAmount) || def.loanAmount,
+              minusBalance: Number(kv.minusBalance) || def.minusBalance,
+              withdrawBaseline: Number(kv.withdrawBaseline) || def.withdrawBaseline,
+              milestones: [
+                {
+                  phase: kv.m1_phase || def.milestones[0].phase,
+                  dueDate: String(kv.m1_dueDate || def.milestones[0].dueDate).slice(
+                    0,
+                    10
+                  ),
+                  cumulative:
+                    Number(kv.m1_cumulative) || def.milestones[0].cumulative
+                },
+                {
+                  phase: kv.m2_phase || def.milestones[1].phase,
+                  dueDate: String(kv.m2_dueDate || def.milestones[1].dueDate).slice(
+                    0,
+                    10
+                  ),
+                  cumulative:
+                    Number(kv.m2_cumulative) || def.milestones[1].cumulative
+                }
+              ]
+            };
+            saveSettings(newSettings);
+
+            var ls = wb.Sheets["내역"];
+            var newLedger = [];
+            if (ls) {
+              var lr = XLSX.utils.sheet_to_json(ls, { header: 1 });
+              for (var j = 1; j < lr.length; j++) {
+                var r = lr[j];
+                if (!r || r.length < 2) continue;
+                var ds = normalizeImportedDate(r[0]);
+                var amt =
+                  typeof r[1] === "number"
+                    ? r[1]
+                    : parseNum(String(r[1]));
+                var kind = koToKind(r[2]);
+                var id =
+                  r[3] != null && String(r[3]).trim() !== ""
+                    ? String(r[3]).trim()
+                    : "imp-" + j + "-" + Date.now();
+                if (!ds || !amt) continue;
+                newLedger.push({
+                  id: id,
+                  date: ds,
+                  amount: amt,
+                  kind: kind
+                });
+              }
+            }
+            saveLedger(newLedger);
+            alert("불러오기 완료했습니다.");
+            fillSettingsForm();
+            render();
+          } catch (err) {
+            alert("파일을 읽지 못했습니다: " + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      document.getElementById("btn-export-xlsx").addEventListener("click", exportToXlsx);
+
+      document.getElementById("import-xlsx").addEventListener("change", function (ev) {
+        var f = ev.target.files && ev.target.files[0];
+        ev.target.value = "";
+        if (!f) return;
+        importFromXlsx(f);
+      });
+
+      (function pageUrl() {
+        var u = document.getElementById("page-url");
+        if (u) u.value = location.href.split("#")[0];
+        document.getElementById("btn-copy-url").addEventListener("click", function () {
+          var t = document.getElementById("page-url").value;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(t).then(function () {
+              alert("주소를 복사했습니다.");
+            });
+          } else {
+            alert(t);
+          }
+        });
+      })();
+
+      render();
+    })();
+  </script>
+</body>
+</html>

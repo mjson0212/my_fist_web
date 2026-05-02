@@ -1,0 +1,32 @@
+# happy_house 폴더만 웹으로 배포 → https://<계정>.github.io/<저장소명>/
+name: Deploy happy_house to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-happy-house
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: happy_house
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
