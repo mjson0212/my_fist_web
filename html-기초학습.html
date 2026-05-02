@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML 기초 학습</title>
+  <style>
+    /* ── 라이트 테마 변수 ── */
+    :root {
+      --body-bg: #f0f4f8;
+      --hero-bg: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      --sidebar-bg: #ffffff;
+      --card-bg: #ffffff;
+      --card-shadow: 0 4px 20px rgba(0,0,0,0.07);
+      --text-main: #1a2a2a;
+      --text-sub: #555;
+      --text-muted: #999;
+      --accent: #11998e;
+      --accent2: #38ef7d;
+      --section-num-bg: linear-gradient(135deg, #11998e, #38ef7d);
+      --heading-demo-bg: #f8fffe;
+      --heading-demo-border: #d4f5e9;
+      --text-demo-bg: #f8fffe;
+      --list-ul-bg: transparent;
+      --list-ol-bg: #f8fffe;
+      --pre-bg: #1e2d2d;
+      --pre-text: #a8f0c6;
+      --table-th: linear-gradient(135deg, #11998e, #38ef7d);
+      --table-td-bg: #ffffff;
+      --table-td-alt: #fafffd;
+      --table-td-border: #f0f0f0;
+      --mistake-bg: #fff8f0;
+      --mistake-border: #f5a623;
+      --mistake-color: #f5a623;
+      --task-bg: #f0f8ff;
+      --task-border: #667eea;
+      --task-color: #667eea;
+      --sidebar-link: #555;
+      --sidebar-num-bg: #e8fdf5;
+      --sidebar-num-text: #11998e;
+      --sub-title-color: #f5576c;
+      --toggle-bg: rgba(17,153,142,0.15);
+      --toggle-border: rgba(17,153,142,0.3);
+      --toggle-text: #11998e;
+      --toggle-shadow: 0 2px 10px rgba(17,153,142,0.2);
+      --link-color: #11998e;
+    }
+
+    /* ── 다크 테마 변수 ── */
+    [data-theme="dark"] {
+      --body-bg: #0d1117;
+      --hero-bg: linear-gradient(135deg, #0d6b63 0%, #1a7a40 100%);
+      --sidebar-bg: #161b22;
+      --card-bg: #161b22;
+      --card-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      --text-main: #c9d1d9;
+      --text-sub: #8b949e;
+      --text-muted: #484f58;
+      --accent: #3fb950;
+      --accent2: #56d364;
+      --section-num-bg: linear-gradient(135deg, #0d6b63, #1a7a40);
+      --heading-demo-bg: #0d1f1e;
+      --heading-demo-border: #1a3a35;
+      --text-demo-bg: #0d1f1e;
+      --list-ul-bg: transparent;
+      --list-ol-bg: #0d1f1e;
+      --pre-bg: #010409;
+      --pre-text: #7ee787;
+      --table-th: linear-gradient(135deg, #0d6b63, #1a7a40);
+      --table-td-bg: #161b22;
+      --table-td-alt: #0d1117;
+      --table-td-border: #21262d;
+      --mistake-bg: #2d1f0a;
+      --mistake-border: #a37000;
+      --mistake-color: #d29922;
+      --task-bg: #0d1f3a;
+      --task-border: #388bfd;
+      --task-color: #58a6ff;
+      --sidebar-link: #8b949e;
+      --sidebar-num-bg: #0d2a1a;
+      --sidebar-num-text: #3fb950;
+      --sub-title-color: #ff7b72;
+      --toggle-bg: rgba(63,185,80,0.15);
+      --toggle-border: rgba(63,185,80,0.3);
+      --toggle-text: #3fb950;
+      --toggle-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      --link-color: #58a6ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--body-bg);
+      color: var(--text-sub);
+      line-height: 1.7;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── 토글 스위치 ── */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--toggle-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--toggle-border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      cursor: pointer;
+      box-shadow: var(--toggle-shadow);
+      color: var(--toggle-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      user-select: none;
+    }
+    .theme-toggle:hover { transform: scale(1.05); }
+
+    .toggle-track {
+      width: 40px; height: 22px;
+      background: rgba(17,153,142,0.3);
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.3s;
+    }
+    [data-theme="dark"] .toggle-track { background: #3fb950; }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
+
+    /* ── 히어로 ── */
+    .hero {
+      background: var(--hero-bg);
+      color: white;
+      text-align: center;
+      padding: 60px 20px 50px;
+      transition: background 0.3s;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.25);
+      border-radius: 30px;
+      padding: 6px 20px;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+    }
+    .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 12px; }
+    .hero p  { font-size: 1.05rem; opacity: 0.9; max-width: 540px; margin: 0 auto; }
+
+    /* ── 레이아웃 ── */
+    .layout {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    /* ── 사이드바 ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-radius: 14px;
+      padding: 24px 20px;
+      box-shadow: var(--card-shadow);
+      position: sticky;
+      top: 20px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .sidebar ol { padding-left: 0; list-style: none; counter-reset: toc; }
+    .sidebar ol li { counter-increment: toc; margin-bottom: 6px; }
+    .sidebar ol li a {
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none;
+      color: var(--sidebar-link);
+      font-size: 0.88rem;
+      padding: 5px 8px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar ol li a::before {
+      content: counter(toc);
+      background: var(--sidebar-num-bg);
+      color: var(--sidebar-num-text);
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .sidebar ol li a:hover { background: var(--sidebar-num-bg); color: var(--accent); }
+
+    /* ── 섹션 카드 ── */
+    .section-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .section-num {
+      display: inline-block;
+      background: var(--section-num-bg);
+      color: white;
+      font-size: 0.75rem; font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .section-card h2 {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      transition: color 0.3s;
+    }
+    .section-card p { color: var(--text-sub); margin-bottom: 10px; transition: color 0.3s; }
+
+    /* ── 코드 블록 ── */
+    pre {
+      background: var(--pre-bg);
+      color: var(--pre-text);
+      border-radius: 12px;
+      padding: 24px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: 'Consolas', 'Courier New', monospace;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── 제목 데모 ── */
+    .heading-demo {
+      background: var(--heading-demo-bg);
+      border: 1px solid var(--heading-demo-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 14px 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .heading-demo h1 { font-size: 2rem;   color: var(--accent); margin-bottom: 4px; }
+    .heading-demo h2 { font-size: 1.6rem; color: var(--accent); margin-bottom: 4px; }
+    .heading-demo h3 { font-size: 1.3rem; color: var(--accent); margin-bottom: 4px; }
+    .heading-demo h4 { font-size: 1.1rem; color: var(--accent); margin-bottom: 4px; }
+    .heading-demo h5 { font-size: 0.95rem; color: var(--accent); margin-bottom: 4px; }
+    .heading-demo h6 { font-size: 0.85rem; color: var(--accent); }
+
+    /* ── 텍스트 강조 데모 ── */
+    .text-demo p {
+      padding: 8px 14px;
+      background: var(--text-demo-bg);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      transition: background 0.3s;
+    }
+
+    /* ── 목록 ── */
+    ul.styled-list, ol.styled-list { padding-left: 0; list-style: none; margin: 12px 0; }
+
+    ul.styled-list li {
+      padding: 8px 14px 8px 36px;
+      position: relative;
+      color: var(--text-sub);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      transition: color 0.3s;
+    }
+    ul.styled-list li::before { content: '●'; position: absolute; left: 12px; color: var(--accent); font-size: 0.5rem; top: 12px; }
+
+    ol.styled-list { counter-reset: ol-counter; }
+    ol.styled-list li {
+      counter-increment: ol-counter;
+      padding: 8px 14px 8px 42px;
+      position: relative;
+      color: var(--text-sub);
+      background: var(--list-ol-bg);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      transition: background 0.3s, color 0.3s;
+    }
+    ol.styled-list li::before {
+      content: counter(ol-counter);
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      background: var(--accent);
+      color: white;
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+    }
+
+    /* ── 링크 ── */
+    a {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px dotted var(--link-color);
+      transition: color 0.3s;
+    }
+    a:hover { opacity: 0.75; }
+
+    /* ── 표 ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+    th {
+      background: var(--table-th);
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 11px 16px;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--table-td-border);
+      background: var(--table-td-bg);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--table-td-alt); }
+
+    /* ── 실수 목록 ── */
+    ol.mistake-list { padding-left: 0; list-style: none; counter-reset: mistake; }
+    ol.mistake-list li {
+      counter-increment: mistake;
+      padding: 12px 16px 12px 52px;
+      position: relative;
+      background: var(--mistake-bg);
+      border-left: 3px solid var(--mistake-border);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 8px;
+      color: var(--text-sub);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    ol.mistake-list li::before {
+      content: '⚠' counter(mistake);
+      position: absolute; left: 12px;
+      color: var(--mistake-color);
+      font-weight: 700; font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+
+    /* ── 연습 과제 ── */
+    ol.task-list { padding-left: 0; list-style: none; counter-reset: task; }
+    ol.task-list li {
+      counter-increment: task;
+      padding: 12px 16px 12px 52px;
+      position: relative;
+      background: var(--task-bg);
+      border-left: 3px solid var(--task-border);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 8px;
+      color: var(--text-sub);
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+    ol.task-list li::before {
+      content: '✦ ' counter(task);
+      position: absolute; left: 10px;
+      color: var(--task-color);
+      font-weight: 700; font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+
+    /* ── 푸터 ── */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+
+    .main { flex: 1; min-width: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- 다크/라이트 토글 스위치 -->
+  <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드 전환">
+    <span id="toggleEmoji">🌙</span>
+    <div class="toggle-track">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span id="toggleLabel">다크</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-badge">📖 초보자를 위한 가이드</div>
+    <h1>HTML 기초 학습 문서</h1>
+    <p>이 문서는 HTML을 처음 배우는 분들을 위한 기초 학습 자료입니다.<br>각 섹션을 읽고, 직접 코드를 수정해보며 연습해보세요!</p>
+  </div>
+
+  <div class="layout">
+
+    <nav class="sidebar">
+      <h3>목차</h3>
+      <ol>
+        <li><a href="#s1">HTML이란?</a></li>
+        <li><a href="#s2">태그란?</a></li>
+        <li><a href="#s3">기본 구조</a></li>
+        <li><a href="#s4">제목 태그</a></li>
+        <li><a href="#s5">문단 태그</a></li>
+        <li><a href="#s6">텍스트 강조</a></li>
+        <li><a href="#s7">목록 태그</a></li>
+        <li><a href="#s8">링크 태그</a></li>
+        <li><a href="#s9">이미지 태그</a></li>
+        <li><a href="#s10">표 태그</a></li>
+        <li><a href="#s11">주석</a></li>
+        <li><a href="#s12">자주 하는 실수</a></li>
+        <li><a href="#s13">연습 과제</a></li>
+      </ol>
+    </nav>
+
+    <main class="main">
+
+      <div class="section-card" id="s1">
+        <span class="section-num">01</span>
+        <h2>HTML이란 무엇인가?</h2>
+        <p>HTML은 <b>HyperText Markup Language</b>의 약자입니다.</p>
+        <p>웹페이지의 <b>뼈대(구조)</b>를 만드는 언어입니다.</p>
+        <p>쉽게 말하면, 브라우저(크롬, 엣지 등)에게 "여기는 제목이야", "여기는 목록이야" 라고 알려주는 언어입니다.</p>
+      </div>
+
+      <div class="section-card" id="s2">
+        <span class="section-num">02</span>
+        <h2>태그(Tag)란?</h2>
+        <p>HTML은 <b>태그</b>라는 단위로 이루어져 있습니다.</p>
+        <p>태그는 꺾쇠괄호(&lt; &gt;)로 감싸며, 대부분 <b>여는 태그</b>와 <b>닫는 태그</b> 한 쌍으로 이루어집니다.</p>
+        <p>예시:</p>
+        <ul class="styled-list">
+          <li>&lt;h1&gt; 제목입니다 &lt;/h1&gt;</li>
+          <li>&lt;p&gt; 문단입니다 &lt;/p&gt;</li>
+          <li>&lt;b&gt; 굵게 &lt;/b&gt;</li>
+        </ul>
+        <p>닫는 태그는 슬래시(/)가 앞에 붙습니다: <b>&lt;/태그명&gt;</b></p>
+        <p>혼자 쓰는 태그도 있습니다 (닫는 태그 없음): <b>&lt;hr&gt;, &lt;br&gt;</b></p>
+      </div>
+
+      <div class="section-card" id="s3">
+        <span class="section-num">03</span>
+        <h2>HTML 문서의 기본 구조</h2>
+        <p>모든 HTML 파일은 아래 구조를 기본으로 가집니다:</p>
+        <pre>
+&lt;!DOCTYPE html&gt;         ← 이 파일이 HTML임을 선언
+&lt;html lang="ko"&gt;        ← HTML 문서 시작
+  &lt;head&gt;               ← 보이지 않는 설정 영역
+    &lt;meta charset="UTF-8"&gt;  ← 한글 깨짐 방지
+    &lt;title&gt;탭 제목&lt;/title&gt;   ← 브라우저 탭에 표시되는 이름
+  &lt;/head&gt;
+
+  &lt;body&gt;               ← 실제 화면에 보이는 영역
+    여기에 내용 작성!
+  &lt;/body&gt;
+&lt;/html&gt;               ← HTML 문서 끝
+        </pre>
+      </div>
+
+      <div class="section-card" id="s4">
+        <span class="section-num">04</span>
+        <h2>제목 태그 &lt;h1&gt; ~ &lt;h6&gt;</h2>
+        <p>h 뒤의 숫자가 클수록 제목이 작아집니다.</p>
+        <div class="heading-demo">
+          <h1>h1 - 가장 큰 제목</h1>
+          <h2>h2 - 두 번째 제목</h2>
+          <h3>h3 - 세 번째 제목</h3>
+          <h4>h4 - 네 번째 제목</h4>
+          <h5>h5 - 다섯 번째 제목</h5>
+          <h6>h6 - 가장 작은 제목</h6>
+        </div>
+        <p>보통 페이지에서 h1은 한 번만, h2~h3은 섹션 제목으로 씁니다.</p>
+      </div>
+
+      <div class="section-card" id="s5">
+        <span class="section-num">05</span>
+        <h2>문단 태그 &lt;p&gt; 와 줄바꿈 &lt;br&gt;</h2>
+        <p>이것은 첫 번째 문단입니다. p 태그는 위아래로 여백이 생깁니다.</p>
+        <p>이것은 두 번째 문단입니다. 글을 쓸 때 가장 자주 쓰는 태그입니다.</p>
+        <p>br 태그는 줄바꿈만 합니다:<br>이렇게 같은 문단 안에서 줄을 바꿀 수 있습니다.<br>여백 없이 바로 다음 줄로 넘어갑니다.</p>
+      </div>
+
+      <div class="section-card" id="s6">
+        <span class="section-num">06</span>
+        <h2>텍스트 강조</h2>
+        <div class="text-demo">
+          <p>일반 텍스트입니다.</p>
+          <p><b>b 태그: 굵게(Bold) 표시됩니다.</b></p>
+          <p><i>i 태그: 기울임(Italic) 표시됩니다.</i></p>
+          <p><u>u 태그: 밑줄(Underline) 표시됩니다.</u></p>
+          <p><s>s 태그: 취소선 표시됩니다.</s></p>
+          <p><b><i>조합도 가능합니다: 굵게 + 기울임</i></b></p>
+          <p>텍스트 안에서 <b>일부분만</b> 강조할 수도 있습니다.</p>
+        </div>
+      </div>
+
+      <div class="section-card" id="s7">
+        <span class="section-num">07</span>
+        <h2>목록 태그</h2>
+        <h3 style="color:var(--accent); margin-bottom:10px;">순서 없는 목록 &lt;ul&gt; (점으로 표시)</h3>
+        <ul class="styled-list">
+          <li>사과</li>
+          <li>바나나</li>
+          <li>포도</li>
+        </ul>
+        <h3 style="color:var(--accent); margin:16px 0 10px;">순서 있는 목록 &lt;ol&gt; (번호로 표시)</h3>
+        <ol class="styled-list">
+          <li>먼저 이것을 하세요</li>
+          <li>그 다음 이것을 하세요</li>
+          <li>마지막으로 이것을 하세요</li>
+        </ol>
+        <p style="margin-top:12px;">ul = unordered list (순서 없음), ol = ordered list (순서 있음)</p>
+        <p>li = list item (목록 항목)</p>
+      </div>
+
+      <div class="section-card" id="s8">
+        <span class="section-num">08</span>
+        <h2>링크 태그 &lt;a&gt;</h2>
+        <p>a 태그는 클릭하면 다른 페이지로 이동하는 링크를 만듭니다.</p>
+        <p>href 속성에 이동할 주소를 씁니다.</p>
+        <p>예시1 (현재 탭에서 열림): <a href="https://www.naver.com">네이버 바로가기</a></p>
+        <p>예시2 (새 탭에서 열림): <a href="https://www.google.com" target="_blank">구글 새 탭으로 열기</a></p>
+        <p>예시3 (이메일): <a href="mailto:example@email.com">이메일 보내기</a></p>
+        <p style="margin-top:10px;">target="_blank" 를 추가하면 새 탭에서 열립니다.</p>
+      </div>
+
+      <div class="section-card" id="s9">
+        <span class="section-num">09</span>
+        <h2>이미지 태그 &lt;img&gt;</h2>
+        <p>img 태그로 이미지를 삽입합니다. 닫는 태그가 없습니다.</p>
+        <p>src 속성에 이미지 주소를, alt 속성에 이미지 설명을 씁니다.</p>
+        <p>alt는 이미지가 안 보일 때 대신 표시되는 텍스트입니다.</p>
+        <pre>
+사용법: &lt;img src="이미지주소" alt="이미지설명"&gt;
+
+예시:
+&lt;img src="dog.jpg" alt="강아지 사진"&gt;         ← 같은 폴더의 파일
+&lt;img src="https://..." alt="인터넷 이미지"&gt;   ← 인터넷 주소
+        </pre>
+      </div>
+
+      <div class="section-card" id="s10">
+        <span class="section-num">10</span>
+        <h2>표(Table) 태그</h2>
+        <p>표를 만드는 태그입니다.</p>
+        <ul class="styled-list">
+          <li><b>table</b> : 표 전체</li>
+          <li><b>tr</b> : 표의 행(가로줄) — table row</li>
+          <li><b>th</b> : 표의 제목 칸 (굵게 표시됨) — table header</li>
+          <li><b>td</b> : 표의 일반 칸 — table data</li>
+        </ul>
+        <table>
+          <tr><th>이름</th><th>나이</th><th>직업</th></tr>
+          <tr><td>홍길동</td><td>25</td><td>학생</td></tr>
+          <tr><td>김철수</td><td>30</td><td>개발자</td></tr>
+        </table>
+      </div>
+
+      <div class="section-card" id="s11">
+        <span class="section-num">11</span>
+        <h2>주석(Comment)</h2>
+        <p>주석은 코드 안에 메모를 남기는 것입니다.</p>
+        <p>브라우저 화면에는 표시되지 않습니다.</p>
+        <p>코드를 설명하거나, 잠깐 숨기고 싶을 때 사용합니다.</p>
+        <pre>
+사용법: &lt;!-- 여기에 메모를 씁니다 --&gt;
+
+예시:
+&lt;!-- 이 아래는 소개 섹션입니다 --&gt;
+&lt;h2&gt;소개&lt;/h2&gt;
+        </pre>
+      </div>
+
+      <div class="section-card" id="s12">
+        <span class="section-num">12</span>
+        <h2>자주 하는 실수</h2>
+        <ol class="mistake-list">
+          <li><b>닫는 태그를 빠뜨림</b> — &lt;p&gt; 를 열었으면 반드시 &lt;/p&gt; 로 닫아야 합니다</li>
+          <li><b>태그 철자 오류</b> — &lt;tabel&gt; (X) → &lt;table&gt; (O)</li>
+          <li><b>한글 깨짐</b> — &lt;meta charset="UTF-8"&gt; 이 없으면 한글이 깨질 수 있습니다</li>
+          <li><b>파일 저장 안 함</b> — 수정 후 반드시 저장(Ctrl+S) 후 브라우저에서 새로고침(F5) 하세요</li>
+        </ol>
+      </div>
+
+      <div class="section-card" id="s13">
+        <span class="section-num">13</span>
+        <h2>연습 과제</h2>
+        <p style="margin-bottom:16px;">아래 과제를 직접 만들어보세요. 새 .html 파일을 만들어 작성하면 됩니다!</p>
+        <ol class="task-list">
+          <li>h1 태그로 자신의 이름을 써보세요</li>
+          <li>p 태그로 자기소개를 3문장 써보세요</li>
+          <li>ul 태그로 좋아하는 음식 5가지를 목록으로 써보세요</li>
+          <li>a 태그로 자주 가는 사이트 링크를 만들어보세요</li>
+          <li>table 태그로 간단한 표를 만들어보세요</li>
+        </ol>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="footer">
+    <small>HTML 기초 학습 문서 | 처음부터 차근차근 배워봐요! 🌱</small>
+  </div>
+
+  <script>
+    const saved = localStorage.getItem('theme') || 'light';
+    applyTheme(saved);
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const isDark = theme === 'dark';
+      document.getElementById('toggleEmoji').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = isDark ? '라이트' : '다크';
+    }
+  </script>
+
+</body>
+</html>
