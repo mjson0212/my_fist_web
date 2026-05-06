@@ -413,25 +413,23 @@ service cloud.firestore {
 
       <div class="card settings-grid">
         <h3>마이너스 통장</h3>
-        <label class="f">마통 대출·시설 금액 (받은 한도)</label>
+        <label class="f">받은 한도</label>
         <input type="text" id="set-loan" inputmode="numeric" />
-        <label class="f">현재 마통 잔액 (음수 그대로)</label>
+        <label class="f">현재 마통잔액</label>
         <input type="text" id="set-balance" inputmode="numeric" placeholder="-63769347" />
-        <p class="hint">출금가능은 보통 한도 − 빌린 만큼입니다. 아래 기준값과 다르면 직접 맞추세요.</p>
-        <label class="f">출금가능 기준값 D₀ (시작 시점)</label>
+        <label class="f">출금 가능 기준값</label>
         <input type="text" id="set-d0" inputmode="numeric" placeholder="6530653" />
-        <button type="button" class="btn ghost" id="btn-estimate">대출 − |잔액| 으로 출금가능 추정</button>
       </div>
 
       <div class="card">
-        <h3>차수 목표 (엑셀 K₂ K₃)</h3>
+        <h3>차수 목표</h3>
         <div class="row2">
           <div>
             <label class="f">5차 입금일</label>
             <input type="date" id="m1-date" />
           </div>
           <div>
-            <label class="f">5차 누적 목표 (K₂)</label>
+            <label class="f">5차 누적 목표</label>
             <input type="text" id="m1-k" inputmode="numeric" />
           </div>
         </div>
@@ -441,7 +439,7 @@ service cloud.firestore {
             <input type="date" id="m2-date" />
           </div>
           <div>
-            <label class="f">6차 누적 목표 (K₃)</label>
+            <label class="f">6차 누적 목표</label>
             <input type="text" id="m2-k" inputmode="numeric" />
           </div>
         </div>
@@ -449,7 +447,7 @@ service cloud.firestore {
 
       <button type="button" class="btn secondary" id="btn-save-settings">설정 저장</button>
       <p class="note" style="margin-top:12px">
-        메인의 D = D₀ + 마통입금 − (마통납부 + 급사용) · 카드 중도납부는 D 유지
+        출금 가능 금액 = 기준값 + 마통입금 − 납부 − 급사용 · 카드 중도납부는 금액 유지
       </p>
 
       <div class="card" style="margin-top:14px">
@@ -1060,12 +1058,6 @@ service cloud.firestore {
         render();
       });
 
-      document.getElementById("btn-estimate").addEventListener("click", function () {
-        var loan = parseNum(document.getElementById("set-loan").value);
-        var bal = parseNum(document.getElementById("set-balance").value);
-        var est = loan - Math.abs(bal);
-        document.getElementById("set-d0").value = formatCommaDisplay(est);
-      });
 
       bindMoneyInput(document.getElementById("tx-amt"), false);
       bindMoneyInput(document.getElementById("set-loan"), false);
