@@ -317,6 +317,7 @@
         <div class="num" id="disp-d">—</div>
         <div class="subnum" id="disp-d-sub"></div>
         <div id="pill-wrap"></div>
+        <div id="sync-badge" style="font-size:0.72rem;color:#92400e;margin-top:8px">동기화 중...</div>
       </div>
 
       <div class="formula-box" id="formula-text"></div>
@@ -471,7 +472,9 @@
           .doc(room)
           .onSnapshot(function (snap) {
             if (Date.now() < ignoreRemoteUntil) return;
-            if (!snap.exists) return;
+            var badge = document.getElementById("sync-badge");
+            if (badge) badge.style.display = "none";
+            if (!snap.exists) { scheduleCloudPush(); return; }
             var d = snap.data();
             if (!d || typeof d.settingsJson !== "string") return;
             try {
@@ -1198,9 +1201,6 @@
 
 
       localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
-      if (!localStorage.getItem(KEY_LOCAL_TS) && localStorage.getItem(KEY_SETTINGS)) {
-        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
-      }
       refreshFbUi();
       render();
       setTimeout(function () {
