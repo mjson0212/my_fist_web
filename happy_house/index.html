@@ -519,9 +519,8 @@
             })
             .catch(function (e) {
               console.warn(e);
-              updateFbStatus("클라우드 저장 실패: " + e.message, false);
             });
-        }, 500);
+        }, 0);
       }
 
       function persistSettings(s) {
