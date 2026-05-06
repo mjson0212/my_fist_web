@@ -1198,11 +1198,14 @@
 
 
       localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
+      if (!localStorage.getItem(KEY_LOCAL_TS) && localStorage.getItem(KEY_SETTINGS)) {
+        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
+      }
       refreshFbUi();
       render();
       setTimeout(function () {
         var localMs = parseInt(localStorage.getItem(KEY_LOCAL_TS) || "0", 10);
-        if (localMs > 0 && firestoreDb) scheduleCloudPush();
+        if (localMs > 0) scheduleCloudPush();
       }, 2000);
     })();
   </script>
