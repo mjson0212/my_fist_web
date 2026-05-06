@@ -450,29 +450,6 @@ service cloud.firestore {
         출금 가능 금액 = 기준값 + 마통입금 − 납부 − 급사용 · 카드 중도납부는 금액 유지
       </p>
 
-      <div class="card" style="margin-top:14px">
-        <h3>엑셀로 저장 · 깃에서 같이 보기</h3>
-        <p class="note" style="text-align:left;margin:0 0 12px;line-height:1.6">
-          <strong>내보내기</strong>로 <code>happy_house_data.xlsx</code> 저장 후 깃에 같이 올리면 두 사람이 같은 표를 볼 수 있어요.
-          웹만 열었을 때 숫자가 비어 있으면 여기서 <strong>불러오기</strong> 한 번 하면 됩니다.
-        </p>
-        <button type="button" class="btn secondary" id="btn-export-xlsx">
-          엑셀 파일로 내보내기
-        </button>
-        <label class="btn ghost" style="display:block;margin-top:10px;text-align:center;cursor:pointer;padding:12px;border-radius:12px">
-          엑셀 파일 불러오기
-          <input type="file" id="import-xlsx" accept=".xlsx,.xls" class="hidden" />
-        </label>
-      </div>
-
-      <div class="card" style="margin-top:14px">
-        <h3>데이터는 어디에 저장되나요?</h3>
-        <p class="note" style="text-align:left;margin:0;line-height:1.6">
-          <strong>클라우드 연결 시:</strong> 설정·입금 내역이 <strong>Firebase Firestore</strong>(구글 서버)에도 저장되며, 같은 방 코드를 쓴 기기에 실시간 반영됩니다.<br />
-          동시에 이 브라우저에도 복사해 두어 빠르게 열 수 있습니다.<br />
-          엑셀 내보내기는 그대로 백업용으로 쓸 수 있어요.
-        </p>
-      </div>
     </div>
 
     <footer class="note">숫자 입력 시 세 자리마다 콤마가 붙습니다 · 포커스 시 콤마는 잠깐 빠집니다</footer>
