@@ -370,41 +370,6 @@
         <p class="sub">폰에서는 아래 주소만 즐겨찾기 · 깃에 올리면 인터넷 URL로 열립니다</p>
       </header>
 
-      <div class="card">
-        <h3>이 페이지 주소</h3>
-        <input type="text" readonly id="page-url" style="font-size:0.8rem;margin-bottom:8px" />
-        <button type="button" class="btn ghost" id="btn-copy-url">주소 복사</button>
-        <p class="note" style="text-align:left;margin:10px 0 0;line-height:1.55">
-          GitHub에 푸시하고 Pages를 켜면 이 주소가
-          <code>https://아이디.github.io/저장소이름/</code> 형태가 됩니다.
-          각자 폰 브라우저에서 이 URL만 열면 됩니다.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>클라우드 동기화 (Firebase)</h3>
-        <p class="note" style="text-align:left;margin:0 0 10px;line-height:1.55">
-          <strong>1)</strong> <a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a>에서 무료 프로젝트 만들기 → 웹 앱 추가<br />
-          <strong>2)</strong> 프로젝트 설정에서 설정 객체 복사 후, 이 파일 상단의 <code>&lt;script id="firebase-json"&gt;</code> 안에 붙여넣고 깃에 푸시<br />
-          <strong>3)</strong> Firestore 만들기 → <strong>규칙</strong>에 아래 전체 붙여 넣고 게시 (가족용 간단 규칙):
-          <pre style="font-size:0.62rem;margin:8px 0;padding:8px;background:#f5f5f4;border-radius:8px;overflow:auto">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /happy_house_sync/{docId} {
-      allow read, write: if docId.size() &gt;= 16;
-    }
-  }
-}</pre>
-          <strong>4)</strong> 부부만 아는 <strong>방 코드</strong> (영숫자 16자 이상, 같은 값 입력):
-        </p>
-        <label class="f" for="fb-room">방 코드 (가족 공통)</label>
-        <input type="text" id="fb-room" autocomplete="off" placeholder="예: hwjung82kimLee0927happy" />
-        <button type="button" class="btn secondary" id="btn-fb-connect">연결 · 클라우드에 저장하기</button>
-        <button type="button" class="btn ghost" id="btn-fb-disconnect" style="margin-top:8px">동기화 끄기 (로컬만)</button>
-        <div id="fb-status" class="fb-status off">
-          Firebase가 설정되지 않았거나 연결 전입니다.
-        </div>
-      </div>
 
       <div class="card settings-grid">
         <h3>마이너스 통장</h3>
@@ -1235,44 +1200,6 @@ service cloud.firestore {
         importFromXlsx(f);
       });
 
-      (function pageUrl() {
-        var u = document.getElementById("page-url");
-        if (u) u.value = location.href.split("#")[0];
-        document.getElementById("btn-copy-url").addEventListener("click", function () {
-          var t = document.getElementById("page-url").value;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(t).then(function () {
-              alert("주소를 복사했습니다.");
-            });
-          } else {
-            alert(t);
-          }
-        });
-      })();
-
-      document.getElementById("btn-fb-connect").addEventListener("click", function () {
-        var room = sanitizeRoomKey(document.getElementById("fb-room").value);
-        if (room.length < 16) {
-          alert("방 코드는 영숫자·-_ 만 사용하고 16자 이상으로 정해 주세요.");
-          return;
-        }
-        if (!readFirebaseJsonCfg()) {
-          alert(
-            "index.html 상단의 firebase-json 안에 Firebase 웹 앱 설정을 먼저 넣어 주세요."
-          );
-          return;
-        }
-        localStorage.setItem(KEY_FB_ROOM, room);
-        refreshFbUi();
-      });
-
-      document.getElementById("btn-fb-disconnect").addEventListener("click", function () {
-        localStorage.removeItem(KEY_FB_ROOM);
-        detachFirestoreListener();
-        firestoreDb = null;
-        document.getElementById("fb-room").value = "";
-        updateFbStatus("동기화 끔 · 이 브라우저 로컬만 사용합니다.", false);
-      });
 
       localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
       refreshFbUi();
