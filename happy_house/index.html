@@ -309,7 +309,6 @@
     <div id="page-main" class="page on">
       <header class="hero">
         <p class="names">상휘 · 민정</p>
-        <p class="sub">출금가능 금액(D) 기준 · 엑셀 정리 문구와 동일한 로직</p>
       </header>
 
 
@@ -337,22 +336,15 @@
 
       <div class="card">
         <h3>입금·출금 기록</h3>
-        <div class="row2">
-          <div>
-            <label class="f" for="tx-date">기준일</label>
-            <input type="date" id="tx-date" />
-          </div>
-          <div>
-            <label class="f" for="tx-amt">금액</label>
-            <input type="text" id="tx-amt" inputmode="numeric" placeholder="숫자" />
-          </div>
-        </div>
+        <label class="f" for="tx-date">기준일</label>
+        <input type="date" id="tx-date" />
+        <label class="f" for="tx-amt">금액</label>
+        <input type="text" id="tx-amt" inputmode="numeric" placeholder="숫자" />
         <label class="f" for="tx-kind">종류</label>
         <select id="tx-kind">
-          <option value="deposit_minus">마통에 입금 (월급·저축 등 → D 증가)</option>
-          <option value="pay_minus">마통에서 중도금 납부 (→ D 감소)</option>
-          <option value="use_urgent">급하게 인출·사용 (생활비 등 → D 감소)</option>
-          <option value="pay_other">카드·현금·타계좌로 중도금 (D 변동 없음)</option>
+          <option value="deposit_minus">마통에 입금</option>
+          <option value="pay_minus">마통에서 중도금 납부</option>
+          <option value="use_urgent">마통에서 인출·사용</option>
         </select>
         <button type="button" class="btn" id="btn-add">추가</button>
       </div>
@@ -367,7 +359,6 @@
     <div id="page-settings" class="page">
       <header class="hero">
         <p class="names">설정</p>
-        <p class="sub">폰에서는 아래 주소만 즐겨찾기 · 깃에 올리면 인터넷 URL로 열립니다</p>
       </header>
 
 
