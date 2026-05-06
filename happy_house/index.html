@@ -412,6 +412,7 @@
       var KEY_LEDGER = "happy_house_ledger_v4";
       var KEY_LEGACY = "happy_house_ledger_v3";
       var KEY_FB_ROOM = "happy_house_firestore_room_v1";
+      var KEY_LOCAL_TS = "happy_house_local_ts";
       var ROOM_CODE = "sanghwi-minjeong-home2025";
 
       var firestoreDb = null;
@@ -474,6 +475,9 @@
             var d = snap.data();
             if (!d || typeof d.settingsJson !== "string") return;
             try {
+              var firestoreMs = d.updatedAt && d.updatedAt.toMillis ? d.updatedAt.toMillis() : 0;
+              var localMs = parseInt(localStorage.getItem(KEY_LOCAL_TS) || "0", 10);
+              if (localMs > firestoreMs) { scheduleCloudPush(); return; }
               var rs = JSON.parse(d.settingsJson);
               var rl = JSON.parse(d.ledgerJson || "[]");
               rl = rl.map(normalizeLedgerEntry).filter(Boolean);
@@ -521,11 +525,13 @@
 
       function persistSettings(s) {
         saveSettings(s);
+        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
         scheduleCloudPush();
       }
 
       function persistLedger(a) {
         saveLedger(a);
+        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
         scheduleCloudPush();
       }
 
@@ -803,13 +809,13 @@
         document.getElementById("disp-d").textContent = money(D);
         document.getElementById("disp-d").className = "num" + (D < 0 ? " bad" : "");
         document.getElementById("disp-d-sub").textContent =
-          "D₀ " +
+          "기준 " +
           money(settings.withdrawBaseline) +
           " · 마통입금 +" +
           money(sumKind(entries, "deposit_minus")) +
           " · 납부 −" +
           money(sumKind(entries, "pay_minus")) +
-          " · 급사용 −" +
+          " · 인출 −" +
           money(sumKind(entries, "use_urgent"));
 
         var pill = document.getElementById("pill-wrap");
@@ -1194,6 +1200,10 @@
       localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
       refreshFbUi();
       render();
+      setTimeout(function () {
+        var localMs = parseInt(localStorage.getItem(KEY_LOCAL_TS) || "0", 10);
+        if (localMs > 0 && firestoreDb) scheduleCloudPush();
+      }, 2000);
     })();
   </script>
 </body>
