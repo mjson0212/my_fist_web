@@ -486,6 +486,7 @@ service cloud.firestore {
       var KEY_LEDGER = "happy_house_ledger_v4";
       var KEY_LEGACY = "happy_house_ledger_v3";
       var KEY_FB_ROOM = "happy_house_firestore_room_v1";
+      var ROOM_CODE = "sanghwi-minjeong-home2025";
 
       var firestoreDb = null;
       var fbListenerUnsub = null;
@@ -1309,6 +1310,7 @@ service cloud.firestore {
         updateFbStatus("동기화 끔 · 이 브라우저 로컬만 사용합니다.", false);
       });
 
+      localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
       refreshFbUi();
       render();
     })();
