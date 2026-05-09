@@ -613,7 +613,9 @@ function renderDashboard() {
     `<div class="row"><label>월 필요 저축액</label>
       <span class="val ${월필요 > 월목표 ? 'red' : 'green'}">${fmt(월필요)}</span></div>`;
 
-  document.getElementById('dashContent').innerHTML = `
+  const dashEl = document.getElementById('dashContent');
+  dashEl.className = '';
+  dashEl.innerHTML = `
     <div class="hero-card">
       <div class="hero-label">현재 모은 금액</div>
       <div class="hero-amount">${fmt(현재모은금액)}</div>
@@ -664,8 +666,9 @@ function renderHistory() {
   txs.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
 
   if (!txs.length) {
-    document.getElementById('histContent').innerHTML =
-      '<div style="text-align:center;padding:32px;color:#b8b2a8">내역이 없습니다.</div>';
+    const el = document.getElementById('histContent');
+    el.className = '';
+    el.innerHTML = '<div class="loading">내역이 없습니다.</div>';
     return;
   }
 
@@ -718,7 +721,9 @@ function renderHistory() {
   }
   monthHtml += '</div>';
 
-  document.getElementById('histContent').innerHTML = listHtml + monthHtml;
+  const histEl = document.getElementById('histContent');
+  histEl.className = '';
+  histEl.innerHTML = listHtml + monthHtml;
 }
 
 /* ── 내역 CRUD ── */
