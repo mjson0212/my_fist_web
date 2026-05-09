@@ -273,33 +273,47 @@
     .tx-item {
       background: white;
       border-radius: 14px;
-      padding: 13px 14px;
+      padding: 12px 14px 12px 16px;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 7px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border);
+      border-left: 4px solid transparent;
     }
+    .tx-item.입금   { border-left-color: #15803d; }
+    .tx-item.출금   { border-left-color: #b91c1c; }
+    .tx-item.중도금 { border-left-color: #b45309; }
+    .tx-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .tx-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .tx-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tx-memo { font-size: 14px; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-date { font-size: 11px; color: #b8b2a8; font-weight: 500; }
     .tx-tag {
       font-size: 10px;
       font-weight: 800;
-      padding: 3px 9px;
+      padding: 2px 8px;
       border-radius: 99px;
       white-space: nowrap;
-      flex-shrink: 0;
     }
     .tx-tag.입금   { background: var(--success-light); color: #15803d; }
     .tx-tag.출금   { background: var(--danger-light); color: #b91c1c; }
     .tx-tag.중도금 { background: var(--yellow-soft); color: #78350f; }
-    .tx-info { flex: 1; min-width: 0; }
-    .tx-date { font-size: 11px; color: #b8b2a8; font-weight: 500; margin-bottom: 2px; }
-    .tx-memo { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-    .tx-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
-    .tx-amount { font-size: 14px; font-weight: 800; white-space: nowrap; }
+    .tx-amount { font-size: 15px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
     .tx-amount.입금   { color: #15803d; }
     .tx-amount.출금   { color: #b91c1c; }
     .tx-amount.중도금 { color: #78350f; }
-    .tx-btns { display: flex; gap: 4px; }
+    .tx-btns { display: flex; gap: 4px; flex-shrink: 0; }
 
     /* ── Monthly summary ── */
     .month-section { margin-top: 24px; }
@@ -662,14 +676,16 @@ function renderHistory() {
   for (const tx of txs) {
     const tc = tagCls[tx.type] || '';
     listHtml += `
-      <div class="tx-item">
-        <span class="tx-tag ${tc}">${tx.type}</span>
-        <div class="tx-info">
-          <div class="tx-date">${fmtDate(tx.date)}</div>
+      <div class="tx-item ${tc}">
+        <div class="tx-top">
           <div class="tx-memo">${tx.memo || '—'}</div>
-        </div>
-        <div class="tx-right">
           <div class="tx-amount ${tc}">${sign[tx.type] || ''}${fmt(tx.amount)}</div>
+        </div>
+        <div class="tx-bottom">
+          <div class="tx-meta">
+            <span class="tx-date">${fmtDate(tx.date)}</span>
+            <span class="tx-tag ${tc}">${tx.type}</span>
+          </div>
           <div class="tx-btns">
             <button class="btn btn-gray btn-sm" onclick="startEdit('${tx.id}')">수정</button>
             <button class="btn btn-danger btn-sm" onclick="deleteTx('${tx.id}')">삭제</button>
