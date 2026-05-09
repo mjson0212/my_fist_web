@@ -294,11 +294,12 @@
     .tx-info { flex: 1; min-width: 0; }
     .tx-date { font-size: 11px; color: #b8b2a8; font-weight: 500; margin-bottom: 2px; }
     .tx-memo { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-    .tx-amount { font-size: 15px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+    .tx-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .tx-amount { font-size: 14px; font-weight: 800; white-space: nowrap; }
     .tx-amount.입금   { color: #15803d; }
     .tx-amount.출금   { color: #b91c1c; }
     .tx-amount.중도금 { color: #78350f; }
-    .tx-btns { display: flex; gap: 5px; flex-shrink: 0; }
+    .tx-btns { display: flex; gap: 4px; }
 
     /* ── Monthly summary ── */
     .month-section { margin-top: 24px; }
@@ -667,10 +668,12 @@ function renderHistory() {
           <div class="tx-date">${fmtDate(tx.date)}</div>
           <div class="tx-memo">${tx.memo || '—'}</div>
         </div>
-        <div class="tx-amount ${tc}">${sign[tx.type] || ''}${fmt(tx.amount)}</div>
-        <div class="tx-btns">
-          <button class="btn btn-gray btn-sm" onclick="startEdit('${tx.id}')">수정</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteTx('${tx.id}')">삭제</button>
+        <div class="tx-right">
+          <div class="tx-amount ${tc}">${sign[tx.type] || ''}${fmt(tx.amount)}</div>
+          <div class="tx-btns">
+            <button class="btn btn-gray btn-sm" onclick="startEdit('${tx.id}')">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTx('${tx.id}')">삭제</button>
+          </div>
         </div>
       </div>`;
   }
