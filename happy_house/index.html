@@ -389,9 +389,9 @@
       <input type="text" inputmode="numeric" id="s_마통한도" placeholder="80,000,000">
     </div>
     <div class="form-group">
-      <label>현재 출금 가능 금액 (원)</label>
-      <input type="text" inputmode="numeric" id="s_현재출금가능금액" placeholder="20,000,000">
-      <p class="hint">오늘 은행 앱의 실제 출금 가능 잔액 — 잔액이 바뀔 때마다 업데이트</p>
+      <label>초기 출금 가능 금액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_초기출금가능금액" placeholder="20,000,000">
+      <p class="hint">앱 처음 설정 시 은행 앱의 출금 가능 잔액 — 한 번만 입력, 이후 변경 불필요</p>
     </div>
   </div>
 
@@ -452,7 +452,7 @@ let appData = { settings: {}, transactions: [] };
 let editingId = null;
 
 /* ── 콤마 입력 포맷 ── */
-const MONEY_IDS = ['txAmount','s_마통한도','s_현재출금가능금액',
+const MONEY_IDS = ['txAmount','s_마통한도','s_초기출금가능금액',
                    's_회차5필요금액','s_회차6필요금액','s_월목표저축액'];
 
 function addCommas(str) {
@@ -550,24 +550,23 @@ function renderDashboard() {
   const txs = appData.transactions || [];
 
   const 마통한도    = s.마통한도         || 0;
-  const 현재출금가능 = s.현재출금가능금액 || 0;
-  const 마통사용    = 마통한도 - 현재출금가능;
+  const 초기출금가능 = s.초기출금가능금액 ?? s.현재출금가능금액 ?? 0;
+  const 회차5완료   = s.회차5완료 || false;
+  const 회차5필요   = s.회차5필요금액 || 0;
+  const 회차6필요   = s.회차6필요금액 || 0;
+  const 월목표      = s.월목표저축액 || 0;
 
   const 총입금 = txs.filter(t => t.type === '입금').reduce((a,t) => a + (t.amount||0), 0);
   const 총출금 = txs.filter(t => t.type === '출금').reduce((a,t) => a + (t.amount||0), 0);
-  const 현재모은금액 = 현재출금가능 + 총입금 - 총출금;
-
-  const 회차5완료          = s.회차5완료 || false;
-  const 회차5완료시모은금액 = s.회차5완료시모은금액 || 0;
-  const 회차5필요          = s.회차5필요금액 || 0;
-  const 회차6필요          = s.회차6필요금액 || 0;
-  const 월목표             = s.월목표저축액 || 0;
+  const 누적잔액    = 초기출금가능 + 총입금 - 총출금;
+  const 현재모은금액 = 누적잔액 - (회차5완료 ? 회차5필요 : 0);
+  const 마통사용    = 마통한도 - 현재모은금액;
 
   let 회차5모은, 회차5부족, 회차5률;
   if (회차5완료) {
     회차5모은 = 회차5필요; 회차5부족 = 0; 회차5률 = 100;
   } else {
-    회차5모은 = Math.max(0, 현재모은금액);
+    회차5모은 = Math.max(0, 누적잔액);
     회차5부족 = Math.max(0, 회차5필요 - 회차5모은);
     회차5률   = 회차5필요 > 0 ? Math.min(100, 회차5모은 / 회차5필요 * 100) : 0;
   }
@@ -575,8 +574,8 @@ function renderDashboard() {
   const 회차5월필요 = (회차5개월 > 0 && 회차5부족 > 0) ? 회차5부족 / 회차5개월 : 0;
 
   let 회차6모은 = 회차5완료
-    ? Math.max(0, 현재모은금액 - 회차5완료시모은금액)
-    : Math.max(0, 현재모은금액 - 회차5필요);
+    ? Math.max(0, 현재모은금액)
+    : Math.max(0, 누적잔액 - 회차5필요);
   const 회차6부족   = Math.max(0, 회차6필요 - 회차6모은);
   const 회차6률     = 회차6필요 > 0 ? Math.min(100, 회차6모은 / 회차6필요 * 100) : 0;
   const 회차6개월   = monthsUntil(s.회차6납부예정일);
@@ -596,7 +595,7 @@ function renderDashboard() {
     <div class="hero-card">
       <div class="hero-label">현재 모은 금액</div>
       <div class="hero-amount">${fmt(현재모은금액)}</div>
-      <div class="hero-sub">출금 가능 잔액 ${fmt(현재출금가능)}</div>
+      <div class="hero-sub">= 현재 출금 가능 잔액</div>
     </div>
 
     <div class="card">
@@ -629,7 +628,7 @@ function renderDashboard() {
     <div class="card">
       <div class="card-title">마이너스통장 현황</div>
       <div class="row"><label>한도</label><span class="val">${fmt(마통한도)}</span></div>
-      <div class="row"><label>출금 가능</label><span class="val green">${fmt(현재출금가능)}</span></div>
+      <div class="row"><label>출금 가능</label><span class="val green">${fmt(현재모은금액)}</span></div>
       <div class="row"><label>사용 중인 금액</label><span class="val red">${fmt(마통사용)}</span></div>
       <div class="row"><label>누적 입금</label><span class="val green">+${fmt(총입금)}</span></div>
       <div class="row"><label>누적 출금</label><span class="val red">-${fmt(총출금)}</span></div>
@@ -759,10 +758,13 @@ async function deleteTx(id) {
 /* ── 설정 ── */
 function renderSettingsForm() {
   const s = appData.settings || {};
-  const numFields  = ['마통한도','현재출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
+  const numFields  = ['마통한도','초기출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
   const dateFields = ['회차5납부예정일','회차6납부예정일'];
 
-  for (const f of numFields) setMoneyValue('s_' + f, s[f] || null);
+  for (const f of numFields) {
+    const v = f === '초기출금가능금액' ? (s[f] ?? s['현재출금가능금액'] ?? null) : (s[f] || null);
+    setMoneyValue('s_' + f, v);
+  }
   for (const f of dateFields) {
     const el = document.getElementById('s_' + f);
     if (el && s[f]) el.value = s[f];
@@ -774,7 +776,7 @@ function renderSettingsForm() {
 }
 
 async function saveSettings() {
-  const numFields  = ['마통한도','현재출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
+  const numFields  = ['마통한도','초기출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
   const dateFields = ['회차5납부예정일','회차6납부예정일'];
 
   const settings = { ...(appData.settings || {}) };
@@ -789,14 +791,11 @@ async function toggle5Complete() {
   const s = appData.settings || {};
   if (s.회차5완료) {
     if (!confirm('5회차 완료를 취소하시겠습니까?')) return;
-    await saveToFirestore({ settings: { ...s, 회차5완료: false, 회차5완료시모은금액: 0 } });
+    await saveToFirestore({ settings: { ...s, 회차5완료: false } });
   } else {
-    if (!confirm('5회차 중도금 납부를 완료 처리하시겠습니까?')) return;
-    const txs    = appData.transactions || [];
-    const 총입금 = txs.filter(t => t.type === '입금').reduce((a,t) => a + (t.amount||0), 0);
-    const 총출금 = txs.filter(t => t.type === '출금').reduce((a,t) => a + (t.amount||0), 0);
-    const 현재모은 = (s.현재출금가능금액||0) + 총입금 - 총출금;
-    await saveToFirestore({ settings: { ...s, 회차5완료: true, 회차5완료시모은금액: 현재모은 } });
+    const 필요 = s.회차5필요금액 || 0;
+    if (!confirm(`5회차 중도금(${필요.toLocaleString()}원) 납부를 완료 처리하시겠습니까?\n출금 가능 금액에서 해당 금액이 차감됩니다.`)) return;
+    await saveToFirestore({ settings: { ...s, 회차5완료: true } });
   }
 }
 </script>
