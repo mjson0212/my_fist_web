@@ -1,1205 +1,803 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f1eb" />
-  <title>상휘 · 민정 — 중도금 · 마통</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore-compat.js"></script>
-  <script id="firebase-json" type="application/json">
-{
-  "apiKey": "AIzaSyD-fxzMLxJeIi1wyIMMDQ_Sh32rd1LrRmk",
-  "authDomain": "my-happy-home-bluecity.firebaseapp.com",
-  "projectId": "my-happy-home-bluecity",
-  "storageBucket": "my-happy-home-bluecity.firebasestorage.app",
-  "messagingSenderId": "190778736246",
-  "appId": "1:190778736246:web:2bd6e0273d155f759ba957"
-}
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>상휘민정 집 마련 🏡</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --paper: #f4f1eb;
+      --bg: #fffef5;
       --card: #ffffff;
-      --ink: #1c1917;
-      --muted: #78716c;
-      --line: #e7e5e4;
-      --green: #059669;
-      --navy: #1e3a5f;
-      --amber: #d97706;
+      --yellow: #fde68a;
+      --yellow-soft: #fef9c3;
+      --accent: #44403c;
+      --success: #15803d;
+      --success-light: #dcfce7;
       --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --text: #1c1917;
+      --muted: #78716c;
+      --border: #ede8d8;
       --radius: 16px;
-      --shadow: 0 4px 20px rgba(28, 25, 23, 0.06);
-      --font: "Noto Sans KR", system-ui, sans-serif;
+      --shadow: 0 2px 14px rgba(100,80,40,.07), 0 1px 3px rgba(0,0,0,.03);
+      --shadow-sm: 0 1px 6px rgba(0,0,0,.04);
     }
-    * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+
     body {
-      margin: 0;
-      min-height: 100dvh;
-      font-family: var(--font);
-      background: var(--paper);
-      color: var(--ink);
-      padding: max(10px, env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
-    }
-    .wrap { max-width: 460px; margin: 0 auto; }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      padding: 4px;
-      background: #e7e5e4;
-      border-radius: 14px;
-    }
-    .tabs button {
-      flex: 1;
-      font: inherit;
-      font-size: 0.9rem;
-      font-weight: 700;
-      padding: 12px;
-      border: none;
-      border-radius: 11px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-    }
-    .tabs button.on {
-      background: var(--card);
-      color: var(--ink);
-      box-shadow: var(--shadow);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 64px;
     }
 
-    .page { display: none; }
-    .page.on { display: block; }
-
-    .hero { text-align: center; padding: 4px 0 14px; }
-    .hero .names { font-size: 1.45rem; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
-    .hero .sub { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); }
-
-    .big-d {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      padding: 20px;
+    /* ── Header ── */
+    header {
+      background: #ffffff;
+      border-bottom: 3px solid var(--yellow);
+      padding: 20px 20px 16px;
       text-align: center;
-      margin-bottom: 12px;
     }
-    .big-d .lbl { font-size: 0.72rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
-    .big-d .num {
-      font-size: clamp(1.6rem, 7vw, 2rem);
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      color: var(--navy);
-      letter-spacing: -0.03em;
-    }
-    .big-d .num.bad { color: var(--danger); }
-    .big-d .subnum {
+    .header-icon { font-size: 28px; margin-bottom: 4px; }
+    header h1 { font-size: 19px; font-weight: 800; color: #292524; letter-spacing: -.4px; }
+    header .subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
       margin-top: 10px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
+      border: 1px solid;
     }
+    .sync-badge.ok   { background: var(--success-light); color: #15803d; border-color: #bbf7d0; }
+    .sync-badge.busy { background: var(--yellow-soft); color: #78350f; border-color: var(--yellow); }
+    .sync-badge.err  { background: var(--danger-light); color: #b91c1c; border-color: #fecaca; }
 
-    .status-pill {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      background: #fff7ed;
-      color: var(--amber);
-      border: 1px solid #fed7aa;
-    }
-    .status-pill.ok {
-      background: #ecfdf5;
-      color: var(--green);
-      border-color: #a7f3d0;
-    }
-
-    .formula-box {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 0.82rem;
-      line-height: 1.55;
-      margin-bottom: 14px;
-      word-break: keep-all;
-    }
-    .formula-box strong { color: #92400e; }
-
-    .gauge-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      padding: 14px;
-      margin-bottom: 10px;
-      box-shadow: var(--shadow);
-    }
-    .gauge-card .t {
+    /* ── Tabs ── */
+    nav.tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-      font-size: 0.82rem;
+      background: white;
+      border-bottom: 1.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
     }
-    .gauge-card .t span:first-child { font-weight: 700; }
-    .gauge-card .t span:last-child {
-      font-size: 0.76rem;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
+    nav.tabs button {
+      flex: 1;
+      padding: 14px 4px 12px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Pretendard', sans-serif;
+      color: #a8a29e;
+      font-weight: 600;
+      border-bottom: 2.5px solid transparent;
+      transition: color .15s, border-color .15s;
     }
-    .gauge-bar {
-      height: 12px;
-      border-radius: 999px;
-      background: #f5f5f4;
+    nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Tab sections ── */
+    .tab { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+    .tab.active { display: block; animation: fadeUp .22s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Hero card ── */
+    .hero-card {
+      background: linear-gradient(135deg, #fef9c3 0%, #fefce8 100%);
+      border: 1.5px solid var(--yellow);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      margin-bottom: 14px;
+      position: relative;
       overflow: hidden;
     }
-    .gauge-bar > i {
-      display: block;
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.35s ease;
+    .hero-card::after {
+      content: '🏡';
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 52px;
+      opacity: .2;
     }
-    .gauge-bar.total > i {
-      background: linear-gradient(90deg, #059669, #34d399);
-    }
+    .hero-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .hero-amount { font-size: 30px; font-weight: 900; letter-spacing: -1px; margin: 6px 0 4px; color: #1c1917; }
+    .hero-sub { font-size: 12px; color: var(--muted); }
 
-    table.ms {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.76rem;
-      margin-top: 8px;
-    }
-    table.ms th, table.ms td {
-      padding: 8px 6px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-    }
-    table.ms th { color: var(--muted); font-weight: 600; }
-
+    /* ── Cards ── */
     .card {
       background: var(--card);
       border-radius: var(--radius);
-      border: 1px solid var(--line);
-      padding: 16px;
-      margin-bottom: 12px;
+      padding: 18px;
       box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
     }
-    .card h3 { margin: 0 0 12px; font-size: 0.95rem; }
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #292524;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: var(--yellow);
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
 
-    label.f {
-      font-size: 0.72rem;
-      font-weight: 600;
+    /* ── Rows ── */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      gap: 8px;
+    }
+    .row:last-child { border-bottom: none; }
+    .row label { color: #a8a29e; flex-shrink: 0; font-size: 13px; font-weight: 500; }
+    .row .val { font-weight: 700; text-align: right; }
+    .row .val.big { font-size: 22px; }
+    .row .val.green { color: var(--success); }
+    .row .val.red   { color: var(--danger); }
+
+    /* ── Progress ── */
+    .gauge { margin-top: 16px; }
+    .gauge-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
       color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .bar { background: #f5f0e4; border-radius: 99px; height: 12px; overflow: hidden; }
+    .fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #fcd34d, #fde68a);
+      transition: width .8s cubic-bezier(.25,.1,.25,1);
+      position: relative;
+    }
+    .fill::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 6px; right: 6px;
+      height: 4px;
+      background: rgba(255,255,255,.55);
+      border-radius: 99px;
+    }
+    .fill.green { background: linear-gradient(90deg, #15803d, #4ade80); }
+
+    /* ── Badge ── */
+    .badge-done {
+      display: inline-block;
+      background: var(--success-light);
+      color: var(--success);
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 12px; }
+    .form-group > label {
       display: block;
-      margin-bottom: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #78716c;
+      margin-bottom: 5px;
     }
-    input, select, textarea {
+    .hint { font-size: 11px; color: #b8b2a8; margin-top: 5px; line-height: 1.5; }
+
+    input[type=text], input[type=date], select {
       width: 100%;
-      font: inherit;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: #fafaf9;
-      margin-bottom: 10px;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--text);
+      background: #fffef8;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+      appearance: none;
+      font-family: 'Pretendard', sans-serif;
     }
-    textarea { min-height: 72px; resize: vertical; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    input:focus, select:focus {
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 3px rgba(251,191,36,.15);
+      background: white;
+    }
 
     .btn {
-      font: inherit;
-      font-weight: 700;
-      padding: 13px;
-      border: none;
-      border-radius: 12px;
-      background: var(--green);
-      color: #fff;
-      cursor: pointer;
-      width: 100%;
-    }
-    .btn.secondary { background: var(--navy); }
-    .btn.ghost {
-      background: #f5f5f4;
-      color: var(--ink);
-      font-size: 0.85rem;
-      padding: 10px;
-    }
-
-    .log-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 8px;
+      display: inline-flex;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.84rem;
-    }
-    .log-row:last-child { border-bottom: none; }
-    .tag {
-      font-size: 0.62rem;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-    .tag.pm { background: #e0e7f0; color: var(--navy); }
-    .tag.di { background: #d1fae5; color: #065f46; }
-    .tag.po { background: #fef3c7; color: #92400e; }
-    .tag.ug { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
-    .del {
+      justify-content: center;
+      padding: 12px 18px;
       border: none;
-      background: none;
-      color: var(--muted);
-      font-size: 0.72rem;
-      cursor: pointer;
-    }
-
-    .settings-grid .hint {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin: -6px 0 12px;
-      line-height: 1.45;
-    }
-
-    footer.note {
-      font-size: 0.68rem;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.5;
-      padding: 8px;
-    }
-    .sync-tip {
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      font-size: 0.8rem;
-      line-height: 1.55;
-      color: #065f46;
-    }
-    .sync-tip strong { display: block; margin-bottom: 6px; font-size: 0.85rem; }
-    .fb-status {
-      font-size: 0.78rem;
-      padding: 10px 12px;
       border-radius: 10px;
-      margin-top: 10px;
-      line-height: 1.45;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: opacity .12s, transform .12s;
+      white-space: nowrap;
+      font-family: 'Pretendard', sans-serif;
     }
-    .fb-status.off { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
-    .fb-status.on { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    .hidden { display: none !important; }
+    .btn:active { opacity: .8; transform: scale(.97); }
+    .btn-primary { background: #44403c; color: white; }
+    .btn-success { background: linear-gradient(135deg, #15803d, #22c55e); color: white; }
+    .btn-danger  { background: #dc2626; color: white; }
+    .btn-gray    { background: #f0ece0; color: #78716c; }
+    .btn-full    { width: 100%; }
+    .btn-sm      { padding: 5px 11px; font-size: 12px; border-radius: 7px; }
+
+    /* ── Edit banner ── */
+    .edit-banner {
+      background: var(--yellow-soft);
+      border: 1.5px solid var(--yellow);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #78350f;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .edit-banner.show { display: block; }
+
+    /* ── Transaction list ── */
+    .tx-list { display: flex; flex-direction: column; gap: 10px; }
+    .tx-item {
+      background: white;
+      border-radius: 14px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+    .tx-tag {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 99px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tx-tag.입금   { background: var(--success-light); color: #15803d; }
+    .tx-tag.출금   { background: var(--danger-light); color: #b91c1c; }
+    .tx-tag.중도금 { background: var(--yellow-soft); color: #78350f; }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-date { font-size: 11px; color: #b8b2a8; font-weight: 500; margin-bottom: 2px; }
+    .tx-memo { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+    .tx-amount { font-size: 15px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+    .tx-amount.입금   { color: #15803d; }
+    .tx-amount.출금   { color: #b91c1c; }
+    .tx-amount.중도금 { color: #78350f; }
+    .tx-btns { display: flex; gap: 5px; flex-shrink: 0; }
+
+    /* ── Monthly summary ── */
+    .month-section { margin-top: 24px; }
+    .month-section h3 { font-size: 13px; font-weight: 800; color: #78716c; margin-bottom: 10px; }
+    .month-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 6px;
+      border: 1px solid var(--border);
+      align-items: center;
+    }
+    .month-row .m-date { color: #a8a29e; font-weight: 600; }
+    .month-row .m-in   { color: #15803d; font-weight: 700; }
+    .month-row .m-out  { color: #b91c1c; font-weight: 700; }
+
+    .s-sep { height: 1px; background: var(--border); margin: 14px 0; }
+    .loading { text-align: center; padding: 52px; color: #b8b2a8; }
+
+    @media (max-width: 440px) {
+      .tab { padding: 12px; }
+      nav.tabs button { font-size: 12px; }
+      .hero-amount { font-size: 24px; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <nav class="tabs" role="tablist">
-      <button type="button" class="on" data-page="main">메인</button>
-      <button type="button" data-page="settings">설정</button>
-    </nav>
 
-    <!-- 메인 -->
-    <div id="page-main" class="page on">
-      <header class="hero">
-        <p class="names">상휘 · 민정</p>
-      </header>
+<header>
+  <div class="header-icon">🏡</div>
+  <h1>상휘민정 집 마련</h1>
+  <p class="subtitle">함께 모아가는 우리 집</p>
+  <div id="syncBadge" class="sync-badge busy">● 연결 중...</div>
+</header>
 
+<nav class="tabs">
+  <button class="active" onclick="switchTab('dashboard',this)">대시보드</button>
+  <button onclick="switchTab('history',this)">입출금 내역</button>
+  <button onclick="switchTab('settings',this)">설정</button>
+</nav>
 
-      <div class="big-d">
-        <div class="lbl">출금 가능 금액 (D)</div>
-        <div class="num" id="disp-d">—</div>
-        <div class="subnum" id="disp-d-sub"></div>
-        <div id="pill-wrap"></div>
-      </div>
+<!-- ═══ 대시보드 ═══ -->
+<section id="tab-dashboard" class="tab active">
+  <div id="dashContent" class="loading">데이터 불러오는 중...</div>
+</section>
 
-      <div class="formula-box" id="formula-text"></div>
-
-      <div class="gauge-card">
-        <div class="t">
-          <span id="g-title">6차 누적 목표까지</span>
-          <span id="g-meta"></span>
-        </div>
-        <div class="gauge-bar total"><i id="g-bar" style="width:0%"></i></div>
-      </div>
-
-      <div class="card">
-        <h3>차수 일정 (참고)</h3>
-        <table class="ms" id="ms-table"></table>
-      </div>
-
-      <div class="card">
-        <h3>입금·출금 기록</h3>
-        <label class="f" for="tx-date">기준일</label>
-        <input type="date" id="tx-date" />
-        <label class="f" for="tx-amt">금액</label>
-        <input type="text" id="tx-amt" inputmode="numeric" placeholder="숫자" />
-        <label class="f" for="tx-kind">종류</label>
-        <select id="tx-kind">
-          <option value="deposit_minus">마통에 입금</option>
-          <option value="pay_minus">마통에서 중도금 납부</option>
-          <option value="use_urgent">마통에서 인출·사용</option>
-        </select>
-        <button type="button" class="btn" id="btn-add">추가</button>
-      </div>
-
-      <div class="card">
-        <h3>내역 · 최신순</h3>
-        <div id="log"></div>
-      </div>
+<!-- ═══ 입출금 내역 ═══ -->
+<section id="tab-history" class="tab">
+  <div class="card">
+    <div class="card-title">내역 추가 / 수정</div>
+    <div id="editBanner" class="edit-banner">✏️ 수정 모드 — 내용을 수정 후 저장하세요</div>
+    <div class="form-group">
+      <label>날짜</label>
+      <input type="date" id="txDate">
     </div>
+    <div class="form-group">
+      <label>구분</label>
+      <select id="txType">
+        <option value="입금">입금</option>
+        <option value="출금">출금</option>
+        <option value="중도금 납부">중도금 납부</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>금액 (원)</label>
+      <input type="text" inputmode="numeric" id="txAmount" placeholder="금액 입력">
+    </div>
+    <div class="form-group">
+      <label>메모</label>
+      <input type="text" id="txMemo" placeholder="예: 월 저축">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" style="flex:1" onclick="submitTx()">저장</button>
+      <button class="btn btn-gray btn-sm" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">취소</button>
+    </div>
+  </div>
+  <div id="histContent" class="loading">데이터 불러오는 중...</div>
+</section>
 
-    <!-- 설정 -->
-    <div id="page-settings" class="page">
-      <header class="hero">
-        <p class="names">설정</p>
-      </header>
-
-
-      <div class="card settings-grid">
-        <h3>마이너스 통장</h3>
-        <label class="f">받은 한도</label>
-        <input type="text" id="set-loan" inputmode="numeric" />
-        <label class="f">현재 마통잔액</label>
-        <input type="text" id="set-balance" inputmode="numeric" placeholder="-63769347" />
-        <label class="f">출금 가능 기준값</label>
-        <input type="text" id="set-d0" inputmode="numeric" placeholder="6530653" />
-      </div>
-
-      <div class="card">
-        <h3>차수 목표</h3>
-        <div class="row2">
-          <div>
-            <label class="f">5차 입금일</label>
-            <input type="date" id="m1-date" />
-          </div>
-          <div>
-            <label class="f">5차 누적 목표</label>
-            <input type="text" id="m1-k" inputmode="numeric" />
-          </div>
-        </div>
-        <div class="row2">
-          <div>
-            <label class="f">6차 입금일</label>
-            <input type="date" id="m2-date" />
-          </div>
-          <div>
-            <label class="f">6차 누적 목표</label>
-            <input type="text" id="m2-k" inputmode="numeric" />
-          </div>
-        </div>
-      </div>
-
-      <button type="button" class="btn secondary" id="btn-save-settings">설정 저장</button>
-
+<!-- ═══ 설정 ═══ -->
+<section id="tab-settings" class="tab">
+  <div class="card">
+    <div class="card-title">마이너스통장</div>
+    <div class="form-group">
+      <label>마통 한도 (원)</label>
+      <input type="text" inputmode="numeric" id="s_마통한도" placeholder="80,000,000">
+    </div>
+    <div class="form-group">
+      <label>초기 출금 가능 금액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_초기출금가능금액" placeholder="20,000,000">
+      <p class="hint">앱을 처음 사용한 날 확인한 잔액 — 기준점이므로 한 번만 입력</p>
+    </div>
+    <div class="form-group">
+      <label>현재 출금 가능 금액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_현재출금가능금액" placeholder="20,000,000">
+      <p class="hint">오늘 은행 앱의 실제 출금 가능 잔액 — 잔액이 바뀔 때마다 업데이트</p>
     </div>
   </div>
 
-  <script>
-    (function () {
-      var KEY_SETTINGS = "happy_house_settings_v1";
-      var KEY_LEDGER = "happy_house_ledger_v4";
-      var KEY_LEGACY = "happy_house_ledger_v3";
-      var KEY_FB_ROOM = "happy_house_firestore_room_v1";
-      var KEY_LOCAL_TS = "happy_house_local_ts";
-      var ROOM_CODE = "sanghwi-minjeong-home2025";
-
-      var firestoreDb = null;
-      var fbListenerUnsub = null;
-      var cloudPushTimer = null;
-      var ignoreRemoteUntil = 0;
-
-      function readFirebaseJsonCfg() {
-        try {
-          var el = document.getElementById("firebase-json");
-          if (!el) return null;
-          var o = JSON.parse(el.textContent);
-          if (
-            o &&
-            typeof o.apiKey === "string" &&
-            o.apiKey.length > 8 &&
-            typeof o.projectId === "string" &&
-            o.projectId.length > 0
-          )
-            return o;
-        } catch (e) {}
-        return null;
-      }
-
-      function sanitizeRoomKey(s) {
-        return String(s || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 120);
-      }
-
-      function initFirestoreDb() {
-        var cfg = readFirebaseJsonCfg();
-        if (!cfg || typeof firebase === "undefined") return null;
-        try {
-          if (!firebase.apps.length) firebase.initializeApp(cfg);
-          return firebase.firestore();
-        } catch (e) {
-          console.warn(e);
-          return null;
-        }
-      }
-
-      function detachFirestoreListener() {
-        if (typeof fbListenerUnsub === "function") {
-          fbListenerUnsub();
-          fbListenerUnsub = null;
-        }
-      }
-
-      function attachFirestoreListener() {
-        detachFirestoreListener();
-        firestoreDb = initFirestoreDb();
-        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
-        if (!firestoreDb || !room || room.length < 16) return false;
-
-        fbListenerUnsub = firestoreDb
-          .collection("happy_house_sync")
-          .doc(room)
-          .onSnapshot(function (snap) {
-            if (Date.now() < ignoreRemoteUntil) return;
-
-            if (!snap.exists) { scheduleCloudPush(); return; }
-            var d = snap.data();
-            if (!d || typeof d.settingsJson !== "string") return;
-            try {
-              var firestoreMs = d.updatedAt && d.updatedAt.toMillis ? d.updatedAt.toMillis() : 0;
-              var localMs = parseInt(localStorage.getItem(KEY_LOCAL_TS) || "0", 10);
-              if (localMs > firestoreMs) { scheduleCloudPush(); return; }
-              var rs = JSON.parse(d.settingsJson);
-              var rl = JSON.parse(d.ledgerJson || "[]");
-              rl = rl.map(normalizeLedgerEntry).filter(Boolean);
-              if (
-                JSON.stringify(rs) === JSON.stringify(loadSettings()) &&
-                JSON.stringify(rl) === JSON.stringify(loadLedger())
-              )
-                return;
-              saveSettings(rs);
-              saveLedger(rl);
-              fillSettingsForm();
-              render();
-            } catch (e) {
-              console.warn(e);
-            }
-          });
-        return true;
-      }
-
-      function scheduleCloudPush() {
-        var cfg = readFirebaseJsonCfg();
-        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
-        if (!cfg || !room || room.length < 16) return;
-
-        var db = firestoreDb || initFirestoreDb();
-        if (!db) return;
-        firestoreDb = db;
-
-        ignoreRemoteUntil = Date.now() + 2500;
-        clearTimeout(cloudPushTimer);
-        cloudPushTimer = setTimeout(function () {
-          db.collection("happy_house_sync")
-            .doc(room)
-            .set({
-              settingsJson: JSON.stringify(loadSettings()),
-              ledgerJson: JSON.stringify(loadLedger()),
-              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .catch(function (e) {
-              console.warn(e);
-            });
-        }, 0);
-      }
-
-      function persistSettings(s) {
-        saveSettings(s);
-        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
-        scheduleCloudPush();
-      }
-
-      function persistLedger(a) {
-        saveLedger(a);
-        localStorage.setItem(KEY_LOCAL_TS, String(Date.now()));
-        scheduleCloudPush();
-      }
-
-      function updateFbStatus(text, ok) {
-        var el = document.getElementById("fb-status");
-        if (!el) return;
-        el.textContent = text;
-        el.className = "fb-status " + (ok ? "on" : "off");
-      }
-
-      function refreshFbUi() {
-        var inp = document.getElementById("fb-room");
-        var room = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM));
-        if (inp) inp.value = room || "";
-
-        if (!readFirebaseJsonCfg()) {
-          updateFbStatus(
-            "Firebase 설정(apiKey·projectId 등)을 이 페이지 상단 firebase-json에 넣어 주세요.",
-            false
-          );
-          return;
-        }
-        if (!room || room.length < 16) {
-          updateFbStatus("방 코드 16자 이상 입력 후 「연결」을 누르세요.", false);
-          return;
-        }
-        firestoreDb = initFirestoreDb();
-        if (!firestoreDb) {
-          updateFbStatus("Firebase 초기화 실패 · 설정 JSON 확인", false);
-          return;
-        }
-        attachFirestoreListener();
-        updateFbStatus(
-          "연결됨 · 클라우드 저장 중 (방 " + room.slice(0, 10) + "…)",
-          true
-        );
-      }
-
-      var defaultSettings = function () {
-        return {
-          loanAmount: 70030000,
-          minusBalance: -63769347,
-          withdrawBaseline: 6530653,
-          milestones: [
-            { phase: "5차", dueDate: "2027-12-10", cumulative: 75520000 },
-            { phase: "6차", dueDate: "2028-03-10", cumulative: 151040000 }
-          ]
-        };
-      };
-
-      function loadSettings() {
-        try {
-          var r = localStorage.getItem(KEY_SETTINGS);
-          if (!r) return defaultSettings();
-          var o = JSON.parse(r);
-          var d = defaultSettings();
-          return {
-            loanAmount: Number(o.loanAmount) || d.loanAmount,
-            minusBalance: Number(o.minusBalance) || d.minusBalance,
-            withdrawBaseline: Number(o.withdrawBaseline) || d.withdrawBaseline,
-            milestones: Array.isArray(o.milestones) && o.milestones.length >= 2
-              ? o.milestones
-              : d.milestones
-          };
-        } catch (e) {
-          return defaultSettings();
-        }
-      }
-
-      function saveSettings(s) {
-        localStorage.setItem(KEY_SETTINGS, JSON.stringify(s));
-      }
-
-      function normalizeLedgerEntry(e) {
-        if (!e || typeof e !== "object") return null;
-        if (
-          e.kind === "deposit_minus" ||
-          e.kind === "pay_minus" ||
-          e.kind === "pay_other" ||
-          e.kind === "use_urgent"
-        )
-          return e;
-        if (e.source === "minus") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_minus" };
-        if (e.source === "card") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
-        if (e.source === "other") return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
-        if (e.fromMinus !== false) return { id: e.id, date: e.date, amount: e.amount, kind: "pay_minus" };
-        return { id: e.id, date: e.date, amount: e.amount, kind: "pay_other" };
-      }
-
-      function loadLedger() {
-        try {
-          var raw = localStorage.getItem(KEY_LEDGER);
-          var arr;
-          if (raw) {
-            arr = JSON.parse(raw);
-          } else {
-            var leg = localStorage.getItem(KEY_LEGACY);
-            arr = leg ? JSON.parse(leg) : [];
-            arr = Array.isArray(arr) ? arr.map(normalizeLedgerEntry).filter(Boolean) : [];
-            if (arr.length) {
-              saveLedger(arr);
-            }
-          }
-          if (!Array.isArray(arr)) return [];
-          arr = arr.map(normalizeLedgerEntry).filter(Boolean);
-          return arr;
-        } catch (e) {
-          return [];
-        }
-      }
-
-      function saveLedger(a) {
-        localStorage.setItem(KEY_LEDGER, JSON.stringify(a));
-      }
-
-      function money(n) {
-        if (n == null || isNaN(n)) return "—";
-        return new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
-      }
-
-      function parseNum(s) {
-        var t = String(s || "").replace(/,/g, "").replace(/\s/g, "");
-        if (t === "" || t === "-") return 0;
-        var n = parseInt(t, 10);
-        return isNaN(n) ? 0 : n;
-      }
-
-      function formatCommaDisplay(n) {
-        if (n === null || n === undefined || n === "") return "";
-        var num = typeof n === "number" ? n : parseNum(String(n));
-        if (isNaN(num)) return "";
-        var neg = num < 0;
-        var f = new Intl.NumberFormat("ko-KR").format(Math.abs(num));
-        return neg ? "-" + f : f;
-      }
-
-      /** 금액 입력: 입력 중·블러 시 콤마 · 포커스 시 숫자만 */
-      function bindMoneyInput(el, allowNegative) {
-        if (!el) return;
-        allowNegative = !!allowNegative;
-        el.addEventListener("focus", function () {
-          var t = String(el.value).replace(/,/g, "").trim();
-          if (t === "") return;
-          el.value = t;
-        });
-        el.addEventListener("blur", function () {
-          var t = String(el.value).replace(/,/g, "").trim();
-          if (t === "" || (allowNegative && t === "-")) {
-            if (t !== "-") el.value = "";
-            return;
-          }
-          var n = parseInt(t, 10);
-          if (isNaN(n)) return;
-          el.value = formatCommaDisplay(n);
-        });
-        el.addEventListener("input", function () {
-          var raw = String(el.value).replace(/,/g, "");
-          if (allowNegative) {
-            var neg = false;
-            var rest = raw;
-            if (rest.indexOf("-") === 0) {
-              neg = true;
-              rest = rest.slice(1);
-            }
-            rest = rest.replace(/\D/g, "");
-            if (rest === "" && !neg) {
-              el.value = "";
-              return;
-            }
-            if (rest === "" && neg) {
-              el.value = "-";
-              return;
-            }
-            var n1 = parseInt(rest, 10);
-            if (isNaN(n1)) return;
-            if (neg) n1 = -n1;
-            el.value = formatCommaDisplay(n1);
-          } else {
-            var digits = raw.replace(/\D/g, "");
-            if (digits === "") {
-              el.value = "";
-              return;
-            }
-            var n2 = parseInt(digits, 10);
-            if (isNaN(n2)) return;
-            el.value = formatCommaDisplay(n2);
-          }
-        });
-      }
-
-      function todayISO() {
-        var d = new Date();
-        var z = function (x) {
-          return (x < 10 ? "0" : "") + x;
-        };
-        return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate());
-      }
-
-      function monthDiff(startIso, endIso) {
-        var a = new Date(startIso + "T12:00:00");
-        var b = new Date(endIso + "T12:00:00");
-        if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
-        if (a > b) return 0;
-        var m =
-          (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
-        return Math.max(0, m);
-      }
-
-      function sumKind(entries, kind) {
-        return entries.reduce(function (a, e) {
-          if (e.kind === kind) return a + (Number(e.amount) || 0);
-          return a;
-        }, 0);
-      }
-
-      function computeD(settings, entries) {
-        var d0 = Number(settings.withdrawBaseline) || 0;
-        var add = sumKind(entries, "deposit_minus");
-        var sub =
-          sumKind(entries, "pay_minus") + sumKind(entries, "use_urgent");
-        return d0 + add - sub;
-      }
-
-      /** 엑셀 F열과 동일 */
-      function excelSummary(Aiso, D, m0, m1) {
-        var K2 = Number(m0.cumulative) || 0;
-        var K3 = Number(m1.cumulative) || 0;
-        var H2 = m0.phase || "5차";
-        var H3 = m1.phase || "6차";
-        var I2 = m0.dueDate;
-        var I3 = m1.dueDate;
-
-        if (D >= K3) return { text: "완료", done: true };
-
-        function part(H, Kneed, Iend) {
-          var need = Kneed - D;
-          var months = monthDiff(Aiso, Iend);
-          var datePart =
-            Aiso > Iend ? "목표일 경과" : months + "개월 남음";
-          return (
-            H +
-            " " +
-            new Intl.NumberFormat("ko-KR").format(Math.max(0, Math.round(need))) +
-            "원 필요 / " +
-            datePart
-          );
-        }
-
-        if (D >= K2) {
-          return { text: part(H3, K3, I3), done: false };
-        }
-        return { text: part(H2, K2, I2), done: false };
-      }
-
-      function escapeHtml(s) {
-        return String(s)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      function render() {
-        var settings = loadSettings();
-        var entries = loadLedger();
-        var D = computeD(settings, entries);
-
-        var m = settings.milestones;
-        var m0 = m[0];
-        var m1 = m[1];
-        var K3 = Number(m1.cumulative) || 1;
-
-        var refDate = document.getElementById("tx-date").value || todayISO();
-        var sum = excelSummary(refDate, D, m0, m1);
-
-        document.getElementById("disp-d").textContent = money(D);
-        document.getElementById("disp-d").className = "num" + (D < 0 ? " bad" : "");
-        document.getElementById("disp-d-sub").textContent =
-          "기준 " +
-          money(settings.withdrawBaseline) +
-          " · 마통입금 +" +
-          money(sumKind(entries, "deposit_minus")) +
-          " · 납부 −" +
-          money(sumKind(entries, "pay_minus")) +
-          " · 인출 −" +
-          money(sumKind(entries, "use_urgent"));
-
-        var pill = document.getElementById("pill-wrap");
-        if (sum.done) {
-          pill.innerHTML =
-            '<span class="status-pill ok">달성 · 6차 누적(K₃) 이상</span>';
-        } else {
-          pill.innerHTML = '<span class="status-pill">미달성</span>';
-        }
-
-        document.getElementById("formula-text").innerHTML =
-          "<strong>정리</strong> · " + escapeHtml(sum.text);
-
-        var pct = Math.min(100, Math.max(0, (D / K3) * 100));
-        document.getElementById("g-bar").style.width = pct + "%";
-        document.getElementById("g-title").textContent =
-          "6차 누적 목표 (" + money(K3) + ") 까지";
-        document.getElementById("g-meta").textContent =
-          Math.round(pct) +
-          "% 채움 · " +
-          money(Math.max(0, K3 - D)) +
-          " 남음";
-
-        document.getElementById("ms-table").innerHTML =
-          "<thead><tr><th>차수</th><th>입금일</th><th>누적 목표</th></tr></thead><tbody>" +
-          "<tr><td>" +
-          escapeHtml(m0.phase) +
-          "</td><td>" +
-          m0.dueDate +
-          "</td><td>" +
-          money(m0.cumulative) +
-          "</td></tr>" +
-          "<tr><td>" +
-          escapeHtml(m1.phase) +
-          "</td><td>" +
-          m1.dueDate +
-          "</td><td>" +
-          money(m1.cumulative) +
-          "</td></tr></tbody>";
-
-        var sorted = entries.slice().sort(function (a, b) {
-          if (String(b.date) !== String(a.date))
-            return String(b.date).localeCompare(String(a.date));
-          return String(b.id).localeCompare(String(a.id));
-        });
-
-        var log = document.getElementById("log");
-        if (!sorted.length) {
-          log.innerHTML =
-            '<p style="color:#78716c;font-size:0.85rem">내역 없음 · 월급 넣었으면 「마통에 입금」</p>';
-        } else {
-          log.innerHTML = sorted
-            .map(function (e) {
-              var tag =
-                e.kind === "deposit_minus"
-                  ? '<span class="tag di">마통입금</span>'
-                  : e.kind === "pay_minus"
-                    ? '<span class="tag pm">마통납부</span>'
-                    : e.kind === "use_urgent"
-                      ? '<span class="tag ug">급사용</span>'
-                      : '<span class="tag po">카드등</span>';
-              return (
-                '<div class="log-row" data-id="' +
-                escapeHtml(e.id) +
-                '"><div><strong>' +
-                money(Number(e.amount)) +
-                "</strong><br /><small style=color:#78716c>" +
-                e.date +
-                "</small></div>" +
-                tag +
-                '<button type="button" class="del">삭제</button></div>'
-              );
-            })
-            .join("");
-        }
-
-        log.querySelectorAll(".del").forEach(function (btn) {
-          btn.onclick = function () {
-            var id = btn.closest(".log-row").getAttribute("data-id");
-            persistLedger(loadLedger().filter(function (x) {
-              return x.id !== id;
-            }));
-            render();
-          };
-        });
-
-        if (!document.getElementById("tx-date").dataset.touched) {
-          document.getElementById("tx-date").value = todayISO();
-        }
-      }
-
-      function fillSettingsForm() {
-        var s = loadSettings();
-        document.getElementById("set-loan").value = formatCommaDisplay(
-          s.loanAmount
-        );
-        document.getElementById("set-balance").value = formatCommaDisplay(
-          s.minusBalance
-        );
-        document.getElementById("set-d0").value = formatCommaDisplay(
-          s.withdrawBaseline
-        );
-        document.getElementById("m1-date").value = s.milestones[0].dueDate;
-        document.getElementById("m1-k").value = formatCommaDisplay(
-          s.milestones[0].cumulative
-        );
-        document.getElementById("m2-date").value = s.milestones[1].dueDate;
-        document.getElementById("m2-k").value = formatCommaDisplay(
-          s.milestones[1].cumulative
-        );
-        var fbr = document.getElementById("fb-room");
-        if (fbr)
-          fbr.value = sanitizeRoomKey(localStorage.getItem(KEY_FB_ROOM)) || "";
-      }
-
-      document.querySelectorAll(".tabs button").forEach(function (b) {
-        b.addEventListener("click", function () {
-          var p = b.getAttribute("data-page");
-          document.querySelectorAll(".tabs button").forEach(function (x) {
-            x.classList.toggle("on", x === b);
-          });
-          document.querySelectorAll(".page").forEach(function (pg) {
-            pg.classList.toggle("on", pg.id === "page-" + p);
-          });
-          if (p === "settings") fillSettingsForm();
-        });
-      });
-
-      document.getElementById("tx-date").addEventListener("change", function () {
-        document.getElementById("tx-date").dataset.touched = "1";
-        render();
-      });
-
-      document.getElementById("btn-add").addEventListener("click", function () {
-        var amt = parseNum(document.getElementById("tx-amt").value);
-        if (amt <= 0) return;
-        var kind = document.getElementById("tx-kind").value;
-        var okKinds =
-          "deposit_minus,pay_minus,pay_other,use_urgent".split(",");
-        if (okKinds.indexOf(kind) === -1) kind = "pay_other";
-        var list = loadLedger();
-        list.push({
-          id: "t-" + Date.now(),
-          date: document.getElementById("tx-date").value || todayISO(),
-          amount: amt,
-          kind: kind
-        });
-        persistLedger(list);
-        document.getElementById("tx-amt").value = "";
-        render();
-      });
-
-      document.getElementById("btn-save-settings").addEventListener("click", function () {
-        var s = {
-          loanAmount: parseNum(document.getElementById("set-loan").value),
-          minusBalance: parseNum(document.getElementById("set-balance").value),
-          withdrawBaseline: parseNum(document.getElementById("set-d0").value),
-          milestones: [
-            {
-              phase: "5차",
-              dueDate: document.getElementById("m1-date").value || "2027-12-10",
-              cumulative: parseNum(document.getElementById("m1-k").value)
-            },
-            {
-              phase: "6차",
-              dueDate: document.getElementById("m2-date").value || "2028-03-10",
-              cumulative: parseNum(document.getElementById("m2-k").value)
-            }
-          ]
-        };
-        persistSettings(s);
-        alert("저장했습니다");
-        render();
-      });
-
-
-      bindMoneyInput(document.getElementById("tx-amt"), false);
-      bindMoneyInput(document.getElementById("set-loan"), false);
-      bindMoneyInput(document.getElementById("set-balance"), true);
-      bindMoneyInput(document.getElementById("set-d0"), false);
-      bindMoneyInput(document.getElementById("m1-k"), false);
-      bindMoneyInput(document.getElementById("m2-k"), false);
-
-      function kindToKo(k) {
-        var map = {
-          deposit_minus: "마통입금",
-          pay_minus: "마통납부",
-          use_urgent: "급사용",
-          pay_other: "카드등"
-        };
-        return map[k] || k;
-      }
-
-      function koToKind(s) {
-        var map = {
-          마통입금: "deposit_minus",
-          마통납부: "pay_minus",
-          급사용: "use_urgent",
-          카드등: "pay_other"
-        };
-        var t = String(s || "").trim();
-        if (map[t]) return map[t];
-        if (
-          ["deposit_minus", "pay_minus", "use_urgent", "pay_other"].indexOf(t) >=
-          0
-        )
-          return t;
-        return "pay_other";
-      }
-
-      function excelSerialToISO(n) {
-        var utcDays = Math.floor(n - 25569);
-        var d = new Date(utcDays * 86400 * 1000);
-        var y = d.getUTCFullYear();
-        var m = String(d.getUTCMonth() + 1).padStart(2, "0");
-        var day = String(d.getUTCDate()).padStart(2, "0");
-        return y + "-" + m + "-" + day;
-      }
-
-      function normalizeImportedDate(v) {
-        if (v == null || v === "") return "";
-        if (v instanceof Date && !isNaN(v.getTime()))
-          return v.toISOString().slice(0, 10);
-        if (typeof v === "number") return excelSerialToISO(v);
-        var s = String(v).trim();
-        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-        return s.slice(0, 10);
-      }
-
-      function exportToXlsx() {
-        if (typeof XLSX === "undefined") {
-          alert(
-            "엑셀 기능을 불러오지 못했습니다. 인터넷에 연결된 뒤 다시 시도하세요."
-          );
-          return;
-        }
-        var settings = loadSettings();
-        var ledger = loadLedger();
-        var wb = XLSX.utils.book_new();
-
-        var setupRows = [
-          ["항목", "값"],
-          ["loanAmount", settings.loanAmount],
-          ["minusBalance", settings.minusBalance],
-          ["withdrawBaseline", settings.withdrawBaseline],
-          ["m1_phase", settings.milestones[0].phase],
-          ["m1_dueDate", settings.milestones[0].dueDate],
-          ["m1_cumulative", settings.milestones[0].cumulative],
-          ["m2_phase", settings.milestones[1].phase],
-          ["m2_dueDate", settings.milestones[1].dueDate],
-          ["m2_cumulative", settings.milestones[1].cumulative]
-        ];
-        XLSX.utils.book_append_sheet(
-          wb,
-          XLSX.utils.aoa_to_sheet(setupRows),
-          "설정"
-        );
-
-        var rows = [["날짜", "금액", "종류", "ID"]];
-        ledger.forEach(function (e) {
-          rows.push([e.date, e.amount, kindToKo(e.kind), e.id]);
-        });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "내역");
-
-        var D = computeD(settings, ledger);
-        var sum = excelSummary(
-          todayISO(),
-          D,
-          settings.milestones[0],
-          settings.milestones[1]
-        );
-        var snap = [
-          ["항목", "값"],
-          ["내보낸_시각_ISO", new Date().toISOString()],
-          ["출금가능_D", D],
-          ["정리", sum.text],
-          ["달성", sum.done ? "완료" : "진행중"]
-        ];
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(snap), "요약");
-
-        XLSX.writeFile(wb, "happy_house_data.xlsx");
-      }
-
-      function importFromXlsx(file) {
-        if (typeof XLSX === "undefined") {
-          alert("엑셀 기능을 불러오지 못했습니다.");
-          return;
-        }
-        var reader = new FileReader();
-        reader.onload = function (ev) {
-          try {
-            var buf = new Uint8Array(ev.target.result);
-            var wb = XLSX.read(buf, { type: "array", cellDates: true });
-            var ss = wb.Sheets["설정"];
-            if (!ss) {
-              alert('시트「설정」이 없습니다. 이 앱에서 내보낸 xlsx인지 확인하세요.');
-              return;
-            }
-            var setupArr = XLSX.utils.sheet_to_json(ss, { header: 1 });
-            var kv = {};
-            for (var i = 1; i < setupArr.length; i++) {
-              var row = setupArr[i];
-              if (row && row[0] != null && row[0] !== "")
-                kv[String(row[0]).trim()] = row[1];
-            }
-            var def = defaultSettings();
-            var newSettings = {
-              loanAmount: Number(kv.loanAmount) || def.loanAmount,
-              minusBalance: Number(kv.minusBalance) || def.minusBalance,
-              withdrawBaseline: Number(kv.withdrawBaseline) || def.withdrawBaseline,
-              milestones: [
-                {
-                  phase: kv.m1_phase || def.milestones[0].phase,
-                  dueDate: String(kv.m1_dueDate || def.milestones[0].dueDate).slice(
-                    0,
-                    10
-                  ),
-                  cumulative:
-                    Number(kv.m1_cumulative) || def.milestones[0].cumulative
-                },
-                {
-                  phase: kv.m2_phase || def.milestones[1].phase,
-                  dueDate: String(kv.m2_dueDate || def.milestones[1].dueDate).slice(
-                    0,
-                    10
-                  ),
-                  cumulative:
-                    Number(kv.m2_cumulative) || def.milestones[1].cumulative
-                }
-              ]
-            };
-            saveSettings(newSettings);
-
-            var ls = wb.Sheets["내역"];
-            var newLedger = [];
-            if (ls) {
-              var lr = XLSX.utils.sheet_to_json(ls, { header: 1 });
-              for (var j = 1; j < lr.length; j++) {
-                var r = lr[j];
-                if (!r || r.length < 2) continue;
-                var ds = normalizeImportedDate(r[0]);
-                var amt =
-                  typeof r[1] === "number"
-                    ? r[1]
-                    : parseNum(String(r[1]));
-                var kind = koToKind(r[2]);
-                var id =
-                  r[3] != null && String(r[3]).trim() !== ""
-                    ? String(r[3]).trim()
-                    : "imp-" + j + "-" + Date.now();
-                if (!ds || !amt) continue;
-                newLedger.push({
-                  id: id,
-                  date: ds,
-                  amount: amt,
-                  kind: kind
-                });
-              }
-            }
-            saveLedger(newLedger);
-            scheduleCloudPush();
-            alert("불러오기 완료했습니다.");
-            fillSettingsForm();
-            render();
-          } catch (err) {
-            alert("파일을 읽지 못했습니다: " + err.message);
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      }
-
-      document.getElementById("btn-export-xlsx").addEventListener("click", exportToXlsx);
-
-      document.getElementById("import-xlsx").addEventListener("change", function (ev) {
-        var f = ev.target.files && ev.target.files[0];
-        ev.target.value = "";
-        if (!f) return;
-        importFromXlsx(f);
-      });
-
-
-      localStorage.setItem(KEY_FB_ROOM, ROOM_CODE);
-      refreshFbUi();
-      render();
-      setTimeout(function () {
-        var localMs = parseInt(localStorage.getItem(KEY_LOCAL_TS) || "0", 10);
-        if (localMs > 0) scheduleCloudPush();
-      }, 2000);
-    })();
-  </script>
+  <div class="card">
+    <div class="card-title">5회차 중도금</div>
+    <div class="form-group">
+      <label>5회차 필요 금액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_회차5필요금액" placeholder="75,000,000">
+    </div>
+    <div class="form-group">
+      <label>5회차 납부 예정일</label>
+      <input type="date" id="s_회차5납부예정일">
+    </div>
+    <div class="s-sep"></div>
+    <button id="btn5Complete" class="btn btn-success btn-full" onclick="toggle5Complete()">5회차 완료 처리</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">6회차 중도금</div>
+    <div class="form-group">
+      <label>6회차 필요 금액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_회차6필요금액" placeholder="75,000,000">
+    </div>
+    <div class="form-group">
+      <label>6회차 납부 예정일</label>
+      <input type="date" id="s_회차6납부예정일">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">저축 목표</div>
+    <div class="form-group">
+      <label>월 목표 저축액 (원)</label>
+      <input type="text" inputmode="numeric" id="s_월목표저축액" placeholder="5,000,000">
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-full" onclick="saveSettings()" style="margin-top:4px">설정 저장</button>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyD-fxzMLxJeIi1wyIMMDQ_Sh32rd1LrRmk",
+  authDomain: "my-happy-home-bluecity.firebaseapp.com",
+  projectId: "my-happy-home-bluecity",
+  storageBucket: "my-happy-home-bluecity.firebasestorage.app",
+  messagingSenderId: "190778736246",
+  appId: "1:190778736246:web:2bd6e0273d155f759ba957"
+});
+
+const db = firebase.firestore();
+const ROOM_ID = "sanghui_minjung_happyhouse_2028";
+const docRef = db.collection("happy_house_sync").doc(ROOM_ID);
+
+let appData = { settings: {}, transactions: [] };
+let editingId = null;
+
+/* ── 콤마 입력 포맷 ── */
+const MONEY_IDS = ['txAmount','s_마통한도','s_초기출금가능금액','s_현재출금가능금액',
+                   's_회차5필요금액','s_회차6필요금액','s_월목표저축액'];
+
+function addCommas(str) {
+  const digits = str.replace(/[^\d]/g, '');
+  if (!digits) return '';
+  return parseInt(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function parseAmt(id) {
+  return parseInt((document.getElementById(id).value || '').replace(/,/g, '')) || 0;
+}
+
+function setMoneyValue(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  MONEY_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function() {
+      const cursor = this.selectionStart;
+      const prevLen = this.value.length;
+      this.value = addCommas(this.value);
+      const diff = this.value.length - prevLen;
+      this.setSelectionRange(cursor + diff, cursor + diff);
+    });
+  });
+  document.getElementById('txDate').value = new Date().toISOString().slice(0, 10);
+});
+
+/* ── 탭 전환 ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── 유틸 ── */
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원';
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  if (!y || !m || !d) return dateStr;
+  return y + '년 ' + parseInt(m) + '월 ' + parseInt(d) + '일';
+}
+
+function monthsUntil(dateStr) {
+  if (!dateStr) return null;
+  const t = new Date(dateStr);
+  const now = new Date();
+  return Math.max(0, (t.getFullYear() - now.getFullYear()) * 12 + (t.getMonth() - now.getMonth()));
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+/* ── Firestore 리스너 ── */
+docRef.onSnapshot(snap => {
+  const badge = document.getElementById('syncBadge');
+  if (snap.exists) {
+    appData = snap.data();
+    appData.transactions = appData.transactions || [];
+    appData.settings     = appData.settings     || {};
+  }
+  badge.textContent = '● 동기화됨';
+  badge.className   = 'sync-badge ok';
+  renderDashboard();
+  renderHistory();
+  renderSettingsForm();
+}, err => {
+  document.getElementById('syncBadge').textContent = '● 연결 오류';
+  document.getElementById('syncBadge').className   = 'sync-badge err';
+  console.error(err);
+});
+
+async function saveToFirestore(partial) {
+  const badge = document.getElementById('syncBadge');
+  badge.textContent = '● 저장 중...';
+  badge.className   = 'sync-badge busy';
+  await docRef.set(partial, { merge: true });
+}
+
+/* ── 대시보드 ── */
+function renderDashboard() {
+  const s   = appData.settings;
+  const txs = appData.transactions || [];
+
+  const 마통한도     = s.마통한도          || 0;
+  const 초기출금가능  = s.초기출금가능금액  || 0;
+  const 현재출금가능  = s.현재출금가능금액  || 0;
+  const 마통사용     = 마통한도 - 현재출금가능;
+
+  const 총입금 = txs.filter(t => t.type === '입금').reduce((a,t) => a + (t.amount||0), 0);
+  const 총출금 = txs.filter(t => t.type === '출금').reduce((a,t) => a + (t.amount||0), 0);
+  const 현재모은금액 = (현재출금가능 - 초기출금가능) + 총입금 - 총출금;
+
+  const 회차5완료          = s.회차5완료 || false;
+  const 회차5완료시모은금액 = s.회차5완료시모은금액 || 0;
+  const 회차5필요          = s.회차5필요금액 || 0;
+  const 회차6필요          = s.회차6필요금액 || 0;
+  const 월목표             = s.월목표저축액 || 0;
+
+  let 회차5모은, 회차5부족, 회차5률;
+  if (회차5완료) {
+    회차5모은 = 회차5필요; 회차5부족 = 0; 회차5률 = 100;
+  } else {
+    회차5모은 = Math.max(0, 현재모은금액);
+    회차5부족 = Math.max(0, 회차5필요 - 회차5모은);
+    회차5률   = 회차5필요 > 0 ? Math.min(100, 회차5모은 / 회차5필요 * 100) : 0;
+  }
+  const 회차5개월   = monthsUntil(s.회차5납부예정일);
+  const 회차5월필요 = (회차5개월 > 0 && 회차5부족 > 0) ? 회차5부족 / 회차5개월 : 0;
+
+  let 회차6모은 = 회차5완료
+    ? Math.max(0, 현재모은금액 - 회차5완료시모은금액)
+    : Math.max(0, 현재모은금액 - 회차5필요);
+  const 회차6부족   = Math.max(0, 회차6필요 - 회차6모은);
+  const 회차6률     = 회차6필요 > 0 ? Math.min(100, 회차6모은 / 회차6필요 * 100) : 0;
+  const 회차6개월   = monthsUntil(s.회차6납부예정일);
+  const 회차6월필요 = (회차6개월 > 0 && 회차6부족 > 0) ? 회차6부족 / 회차6개월 : 0;
+
+  const fillCls = pct => pct >= 100 ? 'green' : '';
+
+  const monthText = m => m === null ? '' : m === 0 ? '이번 달' : m + '개월 후';
+
+  const needRow = (월필요, 월목표) => !월필요 ? '' :
+    `<div class="row"><label>월 필요 저축액</label>
+      <span class="val ${월필요 > 월목표 ? 'red' : 'green'}">${fmt(월필요)}</span></div>`;
+
+  document.getElementById('dashContent').innerHTML = `
+    <div class="hero-card">
+      <div class="hero-label">현재 모은 금액</div>
+      <div class="hero-amount">${fmt(현재모은금액)}</div>
+      <div class="hero-sub">출금 가능 잔액 ${fmt(현재출금가능)}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">5회차 중도금${회차5완료 ? '<span class="badge-done">완료 ✓</span>' : ''}</div>
+      ${회차5완료 ? `<div style="color:var(--success);font-weight:800;padding:10px 0;font-size:15px">🎉 5회차 납부 완료!</div>` : `
+      <div class="row"><label>목표</label><span class="val">${fmt(회차5필요)}</span></div>
+      <div class="row"><label>현재 모은 금액</label><span class="val green">${fmt(회차5모은)}</span></div>
+      <div class="row"><label>부족 금액</label><span class="val red">${fmt(회차5부족)}</span></div>
+      ${s.회차5납부예정일 ? `<div class="row"><label>납부 예정일</label><span class="val">${fmtDate(s.회차5납부예정일)} · ${monthText(회차5개월)}</span></div>` : ''}
+      ${needRow(회차5월필요, 월목표)}`}
+      <div class="gauge">
+        <div class="gauge-header"><span>달성률</span><span>${회차5률.toFixed(1)}%</span></div>
+        <div class="bar"><div class="fill ${fillCls(회차5률)}" style="width:${회차5률}%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">6회차 중도금</div>
+      <div class="row"><label>목표</label><span class="val">${fmt(회차6필요)}</span></div>
+      <div class="row"><label>현재 모은 금액</label><span class="val green">${fmt(회차6모은)}</span></div>
+      <div class="row"><label>부족 금액</label><span class="val red">${fmt(회차6부족)}</span></div>
+      ${s.회차6납부예정일 ? `<div class="row"><label>납부 예정일</label><span class="val">${fmtDate(s.회차6납부예정일)} · ${monthText(회차6개월)}</span></div>` : ''}
+      ${needRow(회차6월필요, 월목표)}
+      <div class="gauge">
+        <div class="gauge-header"><span>달성률</span><span>${회차6률.toFixed(1)}%</span></div>
+        <div class="bar"><div class="fill ${fillCls(회차6률)}" style="width:${회차6률}%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">마이너스통장 현황</div>
+      <div class="row"><label>한도</label><span class="val">${fmt(마통한도)}</span></div>
+      <div class="row"><label>출금 가능</label><span class="val green">${fmt(현재출금가능)}</span></div>
+      <div class="row"><label>사용 중인 금액</label><span class="val red">${fmt(마통사용)}</span></div>
+      <div class="row"><label>누적 입금</label><span class="val green">+${fmt(총입금)}</span></div>
+      <div class="row"><label>누적 출금</label><span class="val red">-${fmt(총출금)}</span></div>
+    </div>
+  `;
+}
+
+/* ── 입출금 내역 ── */
+function renderHistory() {
+  const txs = [...(appData.transactions || [])];
+  txs.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (!txs.length) {
+    document.getElementById('histContent').innerHTML =
+      '<div style="text-align:center;padding:32px;color:#b8b2a8">내역이 없습니다.</div>';
+    return;
+  }
+
+  const tagCls = { '입금': '입금', '출금': '출금', '중도금 납부': '중도금' };
+  const sign   = { '입금': '+', '출금': '-', '중도금 납부': '' };
+
+  let listHtml = '<div class="tx-list">';
+  for (const tx of txs) {
+    const tc = tagCls[tx.type] || '';
+    listHtml += `
+      <div class="tx-item">
+        <span class="tx-tag ${tc}">${tx.type}</span>
+        <div class="tx-info">
+          <div class="tx-date">${fmtDate(tx.date)}</div>
+          <div class="tx-memo">${tx.memo || '—'}</div>
+        </div>
+        <div class="tx-amount ${tc}">${sign[tx.type] || ''}${fmt(tx.amount)}</div>
+        <div class="tx-btns">
+          <button class="btn btn-gray btn-sm" onclick="startEdit('${tx.id}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTx('${tx.id}')">삭제</button>
+        </div>
+      </div>`;
+  }
+  listHtml += '</div>';
+
+  const monthMap = {};
+  for (const tx of txs) {
+    const m = (tx.date || '').slice(0, 7);
+    if (!m) continue;
+    if (!monthMap[m]) monthMap[m] = { in: 0, out: 0 };
+    if (tx.type === '입금')        monthMap[m].in  += tx.amount || 0;
+    if (tx.type === '출금')        monthMap[m].out += tx.amount || 0;
+    if (tx.type === '중도금 납부')  monthMap[m].out += tx.amount || 0;
+  }
+
+  let monthHtml = '<div class="month-section"><h3>월별 합계</h3>';
+  for (const m of Object.keys(monthMap).sort().reverse()) {
+    const [y, mo] = m.split('-');
+    const d = monthMap[m];
+    monthHtml += `
+      <div class="month-row">
+        <span class="m-date">${y}년 ${parseInt(mo)}월</span>
+        <span class="m-in">+${fmt(d.in)}</span>
+        <span class="m-out">-${fmt(d.out)}</span>
+      </div>`;
+  }
+  monthHtml += '</div>';
+
+  document.getElementById('histContent').innerHTML = listHtml + monthHtml;
+}
+
+/* ── 내역 CRUD ── */
+async function submitTx() {
+  const date   = document.getElementById('txDate').value;
+  const type   = document.getElementById('txType').value;
+  const amount = parseAmt('txAmount');
+  const memo   = document.getElementById('txMemo').value.trim();
+
+  if (!date)           { alert('날짜를 입력해 주세요.'); return; }
+  if (!amount || amount <= 0) { alert('금액을 입력해 주세요.'); return; }
+
+  let transactions = [...(appData.transactions || [])];
+
+  if (editingId) {
+    transactions = transactions.map(t =>
+      t.id === editingId ? { ...t, date, type, amount, memo } : t
+    );
+    cancelEdit();
+  } else {
+    transactions.push({ id: uid(), date, type, amount, memo, createdAt: Date.now() });
+    document.getElementById('txAmount').value = '';
+    document.getElementById('txMemo').value   = '';
+  }
+
+  await saveToFirestore({ transactions });
+}
+
+function startEdit(id) {
+  const tx = (appData.transactions || []).find(t => t.id === id);
+  if (!tx) return;
+  editingId = id;
+  document.getElementById('txDate').value = tx.date || '';
+  document.getElementById('txType').value = tx.type || '입금';
+  setMoneyValue('txAmount', tx.amount);
+  document.getElementById('txMemo').value = tx.memo || '';
+  document.getElementById('editBanner').classList.add('show');
+  document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('editBanner').classList.remove('show');
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('txDate').value   = new Date().toISOString().slice(0, 10);
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txMemo').value   = '';
+}
+
+async function deleteTx(id) {
+  if (!confirm('이 내역을 삭제하시겠습니까?')) return;
+  await saveToFirestore({ transactions: (appData.transactions || []).filter(t => t.id !== id) });
+}
+
+/* ── 설정 ── */
+function renderSettingsForm() {
+  const s = appData.settings || {};
+  const numFields  = ['마통한도','초기출금가능금액','현재출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
+  const dateFields = ['회차5납부예정일','회차6납부예정일'];
+
+  for (const f of numFields) setMoneyValue('s_' + f, s[f] || null);
+  for (const f of dateFields) {
+    const el = document.getElementById('s_' + f);
+    if (el && s[f]) el.value = s[f];
+  }
+
+  const btn5 = document.getElementById('btn5Complete');
+  btn5.textContent = s.회차5완료 ? '5회차 완료 취소' : '5회차 완료 처리';
+  btn5.className   = s.회차5완료 ? 'btn btn-gray btn-full' : 'btn btn-success btn-full';
+}
+
+async function saveSettings() {
+  const numFields  = ['마통한도','초기출금가능금액','현재출금가능금액','회차5필요금액','회차6필요금액','월목표저축액'];
+  const dateFields = ['회차5납부예정일','회차6납부예정일'];
+
+  const settings = { ...(appData.settings || {}) };
+  for (const f of numFields) settings[f] = parseAmt('s_' + f);
+  for (const f of dateFields) settings[f] = document.getElementById('s_' + f).value || '';
+
+  await saveToFirestore({ settings });
+  alert('설정이 저장되었습니다.');
+}
+
+async function toggle5Complete() {
+  const s = appData.settings || {};
+  if (s.회차5완료) {
+    if (!confirm('5회차 완료를 취소하시겠습니까?')) return;
+    await saveToFirestore({ settings: { ...s, 회차5완료: false, 회차5완료시모은금액: 0 } });
+  } else {
+    if (!confirm('5회차 중도금 납부를 완료 처리하시겠습니까?')) return;
+    const txs    = appData.transactions || [];
+    const 총입금 = txs.filter(t => t.type === '입금').reduce((a,t) => a + (t.amount||0), 0);
+    const 총출금 = txs.filter(t => t.type === '출금').reduce((a,t) => a + (t.amount||0), 0);
+    const 현재모은 = ((s.현재출금가능금액||0) - (s.초기출금가능금액||0)) + 총입금 - 총출금;
+    await saveToFirestore({ settings: { ...s, 회차5완료: true, 회차5완료시모은금액: 현재모은 } });
+  }
+}
+</script>
 </body>
 </html>
